@@ -7,7 +7,7 @@
  */
 export const SURVEY = {
   /** Google Forms / Microsoft Forms など、何でも OK。空文字なら無効 */
-  url: '',
+  url: 'https://docs.google.com/forms/d/e/1FAIpQLSdreLi7RManuJQlHxJ65mBw5Hw6aXDTA_OdmCJ_MUP4I5-uMg/viewform',
   /** QR の上に表示する一言 */
   label: '感想アンケートにご協力ください',
   /** QR の下の補足 */
