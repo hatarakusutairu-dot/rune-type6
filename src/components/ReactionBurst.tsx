@@ -19,17 +19,10 @@ export default function ReactionBurst() {
   const last = room.events.lastReaction;
   const [bursts, setBursts] = useState<Burst[]>([]);
 
-  // Track which reaction timestamps we've already turned into bursts.
-  // This prevents:
-  //  - replaying past reactions when the component remounts (React StrictMode,
-  //    route changes that unmount/remount this tree, etc.)
-  //  - the React 18 double-invoke of effects firing two bursts per real press
   const seenTsRef = useRef<Set<number>>(new Set());
   const initializedRef = useRef(false);
 
   useEffect(() => {
-    // First pass: record whatever is already in state as "already seen"
-    // so we never burst on mount.
     if (!initializedRef.current) {
       initializedRef.current = true;
       if (last?.ts) seenTsRef.current.add(last.ts);
@@ -39,7 +32,6 @@ export default function ReactionBurst() {
     if (seenTsRef.current.has(last.ts)) return;
     seenTsRef.current.add(last.ts);
 
-    // Cap the seen-set size to avoid unbounded growth over a long session.
     if (seenTsRef.current.size > 200) {
       const arr = Array.from(seenTsRef.current);
       seenTsRef.current = new Set(arr.slice(-100));
@@ -49,11 +41,11 @@ export default function ReactionBurst() {
     const burst: Burst = {
       id,
       key: last.emoji,
-      x: 10 + Math.random() * 80,
-      driftX: -40 + Math.random() * 80,
-      scale: 0.9 + Math.random() * 0.5,
-      rotate: -25 + Math.random() * 50,
-      duration: 2400 + Math.random() * 1200,
+      x: 8 + Math.random() * 84,
+      driftX: -60 + Math.random() * 120,
+      scale: 1.0 + Math.random() * 0.5,
+      rotate: -20 + Math.random() * 40,
+      duration: 5000 + Math.random() * 1800,
     };
     setBursts((prev) => [...prev, burst]);
     const timer = window.setTimeout(() => {
@@ -72,25 +64,26 @@ export default function ReactionBurst() {
           className="absolute"
           style={{
             left: `${b.x}vw`,
-            bottom: '-80px',
+            bottom: '-100px',
             ['--drift' as never]: `${b.driftX}px`,
             ['--rotate' as never]: `${b.rotate}deg`,
             ['--scale' as never]: b.scale,
-            animation: `reaction-float ${b.duration}ms cubic-bezier(.2,.7,.2,1) forwards`,
-            filter: 'drop-shadow(0 0 12px rgba(255,255,255,0.35))',
+            animation: `reaction-float ${b.duration}ms cubic-bezier(.25,.5,.25,1) forwards`,
+            filter:
+              'drop-shadow(0 0 20px rgba(255,255,255,0.55)) drop-shadow(0 0 40px rgba(168,85,247,0.4))',
           }}
         >
           {isImageKey(b.key) ? (
             <img
               src={imageUrlFor(b.key)}
               alt=""
-              className="w-16 h-16 object-contain"
+              className="w-24 h-24 object-contain"
               onError={(e) => {
                 (e.currentTarget as HTMLImageElement).style.display = 'none';
               }}
             />
           ) : (
-            <span className="text-5xl">{b.key}</span>
+            <span className="text-7xl leading-none">{b.key}</span>
           )}
         </span>
       ))}
