@@ -39,6 +39,7 @@ const PHASE_LABELS: Record<string, string> = {
   stage3_comment: '感想入力',
   stage3_wordcloud: 'ワードクラウド',
   stage3_closing: 'まとめ',
+  stage3_survey: 'アンケート',
   closed: '終了',
 };
 
@@ -385,19 +386,20 @@ function PhaseBody() {
 
   if (phase === 'stage3_closing') {
     return (
-      <>
-        <SlideImage
-          phase="stage3_closing"
-          fallback={
-            <Slide title="まとめ">
-              <p className="text-3xl font-black mb-3">"違い" を知ることが、チームの第一歩</p>
-              <p className="text-white/80">今日知ったことを、どこかで思い出してくれたらOK</p>
-            </Slide>
-          }
-        />
-        <SurveyQR />
-      </>
+      <SlideImage
+        phase="stage3_closing"
+        fallback={
+          <Slide title="まとめ">
+            <p className="text-3xl font-black mb-3">"違い" を知ることが、チームの第一歩</p>
+            <p className="text-white/80">今日知ったことを、どこかで思い出してくれたらOK</p>
+          </Slide>
+        }
+      />
     );
+  }
+
+  if (phase === 'stage3_survey') {
+    return <SurveyQR />;
   }
 
   if (phase === 'closed') {

@@ -29,6 +29,7 @@ export const PHASES = [
   'stage3_comment',
   'stage3_wordcloud',
   'stage3_closing',
+  'stage3_survey',
   'closed',
 ] as const;
 
