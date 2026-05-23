@@ -7,48 +7,47 @@
 ## Phase 1 ─ 基盤構築
 
 ### 1.1 リポジトリ初期化
-- [ ] `package.json` 作成、依存導入
-  - dependencies: `react`, `react-dom`, `react-router-dom`, `qrcode.react`, `recharts`
-  - devDependencies: `typescript`, `vite`, `@vitejs/plugin-react`, `tailwindcss`, `postcss`, `autoprefixer`, `@types/react`, `@types/react-dom`, `wrangler`, `@cloudflare/workers-types`
-- [ ] `tsconfig.json` / `tsconfig.app.json` / `tsconfig.worker.json` / `tsconfig.node.json` を分離
-- [ ] `vite.config.ts`（React plugin、`dist/` 出力）
-- [ ] `tailwind.config.js` / `postcss.config.js` / `src/styles/index.css`
-- [ ] `index.html` ルートマウント
-- [ ] `.gitignore` 拡張（`node_modules`, `dist`, `.wrangler`, `.dev.vars`）
+- [x] `package.json` 作成、依存導入
+- [x] `tsconfig.json` / `tsconfig.app.json` / `tsconfig.worker.json` / `tsconfig.node.json` を分離
+- [x] `vite.config.ts`（React plugin、`dist/` 出力）
+- [x] `tailwind.config.js` / `postcss.config.js` / `src/styles/index.css`
+- [x] `index.html` ルートマウント
+- [x] `.gitignore` 拡張（`.wrangler`, `.dev.vars`）
 
 ### 1.2 Worker / Durable Object
-- [ ] `wrangler.toml`（DO バインディング `ROOM_DO`、`compatibility_date`、`assets` 設定）
-- [ ] `worker/index.ts`（fetch ハンドラ、`/ws/:code` upgrade、アセット委譲）
-- [ ] `worker/RoomDO.ts`（Hibernation API、接続管理、ブロードキャスト）
-- [ ] `worker/state.ts`（PHASES 配列、`nextPhase`、`endActive` ロジック）
+- [x] `wrangler.toml`（DO バインディング `ROOM_DO`、`compatibility_date`、`assets` 設定）
+- [x] `worker/index.ts`（fetch ハンドラ、`/ws/:code` upgrade、アセット委譲）
+- [x] `worker/RoomDO.ts`（Hibernation API、接続管理、ブロードキャスト）
+- [x] `worker/state.ts`（PHASES、`nextPhase`、`endActive`、進捗・分布・クロス・ワードクラウド集計）
 
 ### 1.3 共有プロトコル
-- [ ] `shared/protocol.ts`（メッセージ型 union、`Phase` 型、`RoomState` 型）
+- [x] `shared/protocol.ts`（メッセージ型 union、`Phase` 型、`PublicRoomState`/`StudentInfo`、`nextPhase`）
 
 ### 1.4 クライアント基盤
-- [ ] `src/main.tsx` / `src/App.tsx`（HashRouter）
-- [ ] `src/routes/Landing.tsx` / `Teacher.tsx` / `Student.tsx`
-- [ ] `src/lib/sync.ts`（WebSocket クライアント、再接続）
-- [ ] `src/lib/storage.ts`（localStorage v2.0）
-- [ ] `src/types/index.ts`
-- [ ] `RoomContext`（接続状態 + state + send ヘルパー）
+- [x] `src/main.tsx` / `src/App.tsx`（HashRouter）
+- [x] `src/routes/Landing.tsx` / `Teacher.tsx` / `Student.tsx`
+- [x] `src/lib/sync.ts`（WebSocket クライアント、再接続、`createRoom`）
+- [x] `src/lib/storage.ts`（localStorage v2.0）
+- [x] `src/types/index.ts`
+- [x] `RoomContext`（接続状態 + state + send ヘルパー + イベントスナップショット）
 
 ### 1.5 ルーム作成・参加
-- [ ] 講師: `T_CREATE_ROOM` → コード受信 → QR 表示
-- [ ] 生徒: `?room=` 取得 → クラス選択 → `S_JOIN` → 待機画面
-- [ ] sid 発行（Worker 側 `crypto.randomUUID()`）
-- [ ] 再接続時 sid 送信 → `JOINED` で state 復旧
+- [x] 講師: `POST /api/rooms` でコード発行 → WS 接続 → `T_CREATE_ROOM` で claim → QR 表示
+- [x] 生徒: `?room=` 取得 → クラス選択 → `S_JOIN` → 待機画面
+- [x] sid 発行（Worker 側 `crypto.randomUUID()`）
+- [x] 再接続時 sid 送信 → `JOINED` で state 復旧
 
 ### 1.6 フェーズ進行
-- [ ] 講師に「次へ」ボタン
-- [ ] `T_NEXT_PHASE` → `PHASE_CHANGE` 全員配信
-- [ ] 各端末で現フェーズに応じたコンポーネント描画
-- [ ] `stage*_active` での「締切」ボタン → `T_END_ACTIVE`
+- [x] 講師「次へ」ボタン → `T_NEXT_PHASE` → `PHASE_CHANGE` 配信
+- [x] 各端末で現フェーズに応じたコンポーネント描画（lobby / active / その他は Phase 2 以降）
+- [x] `stage*_active` での「締切」ボタン → `T_END_ACTIVE`
 
 ### 1.7 デプロイ確認（Phase 1 完了基準）
-- [ ] ローカルで `npm run dev`、講師1/生徒1 が同期できる
-- [ ] `wrangler deploy` で本番に上がる
-- [ ] GitHub Actions（`deploy.yml`）が main push で実行される
+- [x] `npm run build` 成功（client bundle）
+- [x] `npx wrangler deploy --dry-run` 成功（worker + DO バインディング）
+- [ ] ローカル `npm run dev` + `wrangler dev` で講師1/生徒1 が同期できる（要：ブラウザ実機確認）
+- [ ] 本番 `wrangler deploy`（要：CF アカウント／API token 設定）
+- [x] GitHub Actions（`deploy.yml`）配置済み
 
 ---
 
