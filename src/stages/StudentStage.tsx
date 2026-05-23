@@ -3,6 +3,7 @@ import { useRoom } from '../RoomContext';
 import Quiz from '../components/Quiz';
 import ResultCard from '../components/ResultCard';
 import SlideImage from '../components/SlideImage';
+import SurveyQR from '../components/SurveyQR';
 import { work1Questions } from '../data/work1Questions';
 import { work2Questions } from '../data/work2Questions';
 import { getCombo } from '../data/comboAnalysis';
@@ -281,17 +282,22 @@ export default function StudentStage() {
 
   if (phase === 'stage3_closing') {
     return (
-      <SlidePage
-        phase="stage3_closing"
-        fallback={
-          <Center>
-            <h2 className="text-2xl font-bold mb-3">"違い"を知ることが、チームの第一歩</h2>
-            <p className="text-white/70 text-sm">
-              今日知ったことを、どこかで思い出してくれたらOK。
-            </p>
-          </Center>
-        }
-      />
+      <main key={phase} className="min-h-screen p-4 sm:p-6 animate-[fadein_400ms_ease-out]">
+        <div className="max-w-xl mx-auto">
+          <SlideImage
+            phase="stage3_closing"
+            fallback={
+              <div className="panel text-center">
+                <h2 className="text-2xl font-bold mb-3">"違い"を知ることが、チームの第一歩</h2>
+                <p className="text-white/70 text-sm">
+                  今日知ったことを、どこかで思い出してくれたらOK。
+                </p>
+              </div>
+            }
+          />
+          <SurveyQR />
+        </div>
+      </main>
     );
   }
 

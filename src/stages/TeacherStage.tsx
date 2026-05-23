@@ -7,6 +7,7 @@ import WordCloud from '../components/WordCloud';
 import TypeSlide from '../components/TypeSlide';
 import ClassLobby from '../components/ClassLobby';
 import SlideImage from '../components/SlideImage';
+import SurveyQR from '../components/SurveyQR';
 import { WORK1_ORDER, WORK2_ORDER } from '../lib/scoring';
 
 const PHASE_LABELS: Record<string, string> = {
@@ -384,15 +385,18 @@ function PhaseBody() {
 
   if (phase === 'stage3_closing') {
     return (
-      <SlideImage
-        phase="stage3_closing"
-        fallback={
-          <Slide title="まとめ">
-            <p className="text-3xl font-black mb-3">"違い" を知ることが、チームの第一歩</p>
-            <p className="text-white/80">今日知ったことを、どこかで思い出してくれたらOK</p>
-          </Slide>
-        }
-      />
+      <>
+        <SlideImage
+          phase="stage3_closing"
+          fallback={
+            <Slide title="まとめ">
+              <p className="text-3xl font-black mb-3">"違い" を知ることが、チームの第一歩</p>
+              <p className="text-white/80">今日知ったことを、どこかで思い出してくれたらOK</p>
+            </Slide>
+          }
+        />
+        <SurveyQR />
+      </>
     );
   }
 
