@@ -54,63 +54,65 @@
 ## Phase 2 ─ 診断機能
 
 ### 2.1 データ構造
-- [ ] `src/data/work1Questions.ts`（型定義 + 空配列 20件分の骨組み）
-- [ ] `src/data/work2Questions.ts`（同上）
-- [ ] `src/data/typeInfo.ts`（8タイプ、ID/name/カラー等の骨組み）
-- [ ] `src/data/comboAnalysis.ts`（16パターン + balanced の骨組み）
+- [x] `src/data/work1Questions.ts`（型定義 + 空配列）
+- [x] `src/data/work2Questions.ts`（同上）
+- [x] `src/data/typeInfo.ts`（8タイプ、ID/name/カラー等の骨組み）
+- [x] `src/data/comboAnalysis.ts`（16パターン + balanced の骨組み）
 
 ### 2.2 診断 UI
-- [ ] `src/stages/Stage1Work1.tsx` / `Stage3Work2.tsx`
-- [ ] 1問単位の出題、戻れない、プログレスバー
-- [ ] 選択肢シャッフル（sid + qid シード）
-- [ ] 回答途中の localStorage 保存と復帰
+- [x] `src/components/Quiz.tsx`（ワーク1/2共通）
+- [x] 1問単位の出題、戻れない、プログレスバー
+- [x] 選択肢シャッフル（sid + qid シード、Mulberry32）
+- [x] 回答途中の localStorage 保存と復帰
+- [x] ワーク2冒頭の前文表示
 
 ### 2.3 スコアリング
-- [ ] `src/lib/scoring.ts`
-  - `scoreAnswers`, `judgeType`
-  - 同点処理、バランス判定
+- [x] `src/lib/scoring.ts`
+  - `scoreAnswers`, `judgeType`, `shuffledIndices`
+  - 同点処理（タイプID昇順）、バランス判定（max-min≤2）
 - [ ] 単体テスト（Vitest 任意導入）
 
 ### 2.4 結果カード
-- [ ] `components/RadarChart.tsx`（4軸、ネオン配色）
-- [ ] `components/ResultCard.tsx`（2段階表示、「詳しく見る」展開）
-- [ ] 「同程度の傾向」併記
-- [ ] バランス型カード分岐
+- [x] `components/RadarChart.tsx`（4軸、自前SVG、ネオン配色）
+- [x] `components/ResultCard.tsx`（2段階表示、「詳しく見る」展開）
+- [x] 「同程度の傾向」併記（tieWith）
+- [x] バランス型カード分岐
+- [x] 注記テキスト（学術的検査ではない旨）
 
 ### 2.5 サーバー集計
-- [ ] `S_WORK_RESULT` を Worker が受領 → `StudentInfo` 更新
-- [ ] `PROGRESS` 配信（active 中）
-- [ ] `WORK_DISTRIBUTION` 配信（results 移行時）
+- [x] `S_WORK_RESULT` を Worker が受領 → `StudentInfo` 更新
+- [x] `PROGRESS` 配信（active 中、回答ごとにブロードキャスト）
+- [x] `WORK_DISTRIBUTION` 配信（results フェーズ遷移時）
 
 ---
 
 ## Phase 3 ─ 講師画面
 
 ### 3.1 lobby
-- [ ] QR、合計人数、クラス別人数、開始ボタン
+- [x] QR、合計人数、クラス別人数
 
 ### 3.2 進捗モニター
-- [ ] クラス別進捗バー（active 中）
-- [ ] 締切ボタン
+- [x] クラス別進捗バー（active 中）
+- [x] 締切ボタン
 
 ### 3.3 タイプ分布
-- [ ] `components/Distribution.tsx`（棒 or 円 + %）
-- [ ] 全体 / クラス別タブ切替（`T_SET_DISTRIBUTION_VIEW`）
+- [x] `components/Distribution.tsx`（棒グラフ + %）
+- [x] 全体 / クラス別タブ切替（`T_SET_DISTRIBUTION_VIEW` 同期）
 
 ### 3.4 タイプ解説スライド
-- [ ] `components/TypeSlide.tsx`（typeInfo 駆動）
-- [ ] 8枚分の遷移を `stage1_explain_1..4`, `stage2_explain_1..4` で表示
+- [x] `components/TypeSlide.tsx`（typeInfo 駆動）
+- [x] 8枚分の遷移を `stage1_explain_1..4`, `stage2_explain_1..4` で表示
 
 ### 3.5 ブリッジ・テーマ・ルール・流れ・共有・まとめ
-- [ ] ハードコードのスライドコンポーネント群
+- [x] スライドコンポーネント実装（TeacherStage 内の Slide ヘルパー）
 
 ### 3.6 クロス集計
-- [ ] `components/CrossMatrix.tsx`（4×4＋balanced 別枠）
-- [ ] `CROSS_MATRIX` 配信
+- [x] `components/CrossMatrix.tsx`（4×4＋balanced 別枠）
+- [x] `CROSS_MATRIX` 配信（stage3_summary 遷移時）
 
 ### 3.7 ワードクラウド
-- [ ] `S_COMMENT` 受領、簡易形態素なし（分かち書きはスペース/句読点で十分）
-- [ ] `components/WordCloud.tsx`（自前 SVG、頻度に応じてサイズ）
+- [x] `S_COMMENT` 受領、簡易分かち書き（スペース/句読点 + ストップワード除去）
+- [x] `components/WordCloud.tsx`（頻度に応じたフォントサイズ）
 
 ---
 
