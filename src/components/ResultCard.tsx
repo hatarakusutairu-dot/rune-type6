@@ -45,6 +45,16 @@ export default function ResultCard({ workId, scores, mainType, subType, tieWith 
   const main = isBalanced ? null : typeInfo[mainType];
   const sub = typeInfo[subType];
 
+  const hasDetail =
+    !!main &&
+    ((main.motivators && main.motivators.length > 0) ||
+      (main.demotivators && main.demotivators.length > 0) ||
+      (main.goodSigns && main.goodSigns.length > 0) ||
+      (main.badSigns && main.badSigns.length > 0) ||
+      !!main.helpfulActions ||
+      !!main.teamValue ||
+      !!main.overdone);
+
   return (
     <article className="panel" style={{ borderColor: `${color}55` }}>
       <header className="mb-4">
@@ -53,6 +63,9 @@ export default function ResultCard({ workId, scores, mainType, subType, tieWith 
           {headline}
         </h2>
         {main?.catchcopy && <p className="text-white/80 mt-1">{main.catchcopy}</p>}
+        {main?.description && (
+          <p className="text-white/70 text-sm mt-2 leading-relaxed">{main.description}</p>
+        )}
         {tieWith && (
           <p className="text-white/60 text-sm mt-2">
             ※ {labels[tieWith]} と同程度の傾向も見られました
@@ -75,14 +88,19 @@ export default function ResultCard({ workId, scores, mainType, subType, tieWith 
         ※ 今日の回答での傾向です。固定的な性格分類ではありません。
       </p>
 
-      <button
-        onClick={() => setExpanded((v) => !v)}
-        className="btn-ghost w-full"
-      >
-        {expanded ? '閉じる' : '詳しく見る'}
-      </button>
+      {(hasDetail || isBalanced) && (
+        <button onClick={() => setExpanded((v) => !v)} className="btn-ghost w-full">
+          {expanded ? '閉じる' : '詳しく見る'}
+        </button>
+      )}
 
-      {expanded && !isBalanced && main && (
+      {!hasDetail && !isBalanced && (
+        <p className="text-white/50 text-xs text-center">
+          このあと両方のワークが終わると、もっと詳しい総合分析が見られるよ ✨
+        </p>
+      )}
+
+      {expanded && !isBalanced && main && hasDetail && (
         <div className="mt-5 space-y-4 text-sm">
           <DetailSection emoji="💬" title="燃える言葉" items={main.motivators} />
           <DetailSection emoji="🚫" title="やる気なくす言葉" items={main.demotivators} />

@@ -13,11 +13,13 @@ export default function RadarChart({
   colors,
   labels,
   max = 20,
-  size = 280,
+  size = 340,
 }: Props) {
+  // Reserve space for outer labels so long Japanese names don't clip.
+  const labelPad = 56;
   const cx = size / 2;
   const cy = size / 2;
-  const radius = size / 2 - 36;
+  const radius = size / 2 - labelPad;
   const n = order.length;
 
   function pointFor(value: number, i: number): [number, number] {
@@ -34,16 +36,14 @@ export default function RadarChart({
   const points = order.map((t, i) => pointFor(scores[t] ?? 0, i));
   const polygon = points.map(([x, y]) => `${x},${y}`).join(' ');
 
-  // Background rings
-  const rings = [0.25, 0.5, 0.75, 1].map((s) => {
-    const ringPoints = order
+  const rings = [0.25, 0.5, 0.75, 1].map((s) =>
+    order
       .map((_, i) => {
         const [x, y] = pointFor(max * s, i);
         return `${x},${y}`;
       })
-      .join(' ');
-    return ringPoints;
-  });
+      .join(' '),
+  );
 
   const mainTypeColor = order.reduce(
     (best, t) => ((scores[t] ?? 0) > (scores[best] ?? 0) ? t : best),
@@ -51,8 +51,21 @@ export default function RadarChart({
   );
   const fill = colors[mainTypeColor] ?? '#ffffff';
 
+  function anchorFor(i: number): 'start' | 'middle' | 'end' {
+    const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
+    const dx = Math.cos(angle);
+    if (Math.abs(dx) < 0.15) return 'middle';
+    return dx > 0 ? 'start' : 'end';
+  }
+
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="select-none">
+    <svg
+      width="100%"
+      height="100%"
+      viewBox={`0 0 ${size} ${size}`}
+      className="select-none w-full max-w-sm"
+      style={{ aspectRatio: '1 / 1' }}
+    >
       {rings.map((rp, idx) => (
         <polygon
           key={idx}
@@ -82,16 +95,16 @@ export default function RadarChart({
       ))}
       {order.map((t, i) => {
         const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
-        const lx = cx + (radius + 18) * Math.cos(angle);
-        const ly = cy + (radius + 18) * Math.sin(angle);
+        const lx = cx + (radius + 14) * Math.cos(angle);
+        const ly = cy + (radius + 14) * Math.sin(angle);
         return (
           <text
             key={t}
             x={lx}
             y={ly}
-            textAnchor="middle"
+            textAnchor={anchorFor(i)}
             dominantBaseline="middle"
-            fontSize={12}
+            fontSize={13}
             fill={colors[t]}
             className="font-bold"
           >
