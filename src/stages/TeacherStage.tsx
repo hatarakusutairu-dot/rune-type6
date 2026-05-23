@@ -5,6 +5,7 @@ import Distribution from '../components/Distribution';
 import CrossMatrix from '../components/CrossMatrix';
 import WordCloud from '../components/WordCloud';
 import TypeSlide from '../components/TypeSlide';
+import ClassLobby from '../components/ClassLobby';
 import { WORK1_ORDER, WORK2_ORDER } from '../lib/scoring';
 
 const PHASE_LABELS: Record<string, string> = {
@@ -136,19 +137,17 @@ function PhaseBody() {
   if (phase === 'lobby') {
     return (
       <section className="panel">
-        <h3 className="text-xl font-bold mb-3">参加者を待っています</h3>
-        <p className="text-white/70 mb-4">
-          現在の入室者：<span className="font-bold">{room.studentCount}</span> 名
-        </p>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
-          {(room.state?.classes ?? []).map((c) => (
-            <div key={c} className="rounded-lg border border-white/10 bg-white/5 p-3">
-              <div className="text-white/60 text-xs">{c}</div>
-              <div className="text-2xl font-bold">{room.perClassCount[c] ?? 0}</div>
-            </div>
-          ))}
-        </div>
         {room.code && <JoinQR code={room.code} />}
+        <div className="mt-8">
+          <ClassLobby
+            classes={room.state?.classes ?? []}
+            perClassCount={room.perClassCount}
+            totalCount={room.studentCount}
+          />
+        </div>
+        <p className="text-center text-white/40 text-xs mt-6">
+          全員揃ったら右上の「次へ →」で開始 ▶
+        </p>
       </section>
     );
   }
