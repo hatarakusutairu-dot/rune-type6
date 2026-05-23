@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRoom } from '../RoomContext';
 import { imageUrlFor, isImageKey } from '../lib/reactions';
 
@@ -19,26 +19,48 @@ export default function ReactionBurst() {
   const last = room.events.lastReaction;
   const [bursts, setBursts] = useState<Burst[]>([]);
 
+  // Track which reaction timestamps we've already turned into bursts.
+  // This prevents:
+  //  - replaying past reactions when the component remounts (React StrictMode,
+  //    route changes that unmount/remount this tree, etc.)
+  //  - the React 18 double-invoke of effects firing two bursts per real press
+  const seenTsRef = useRef<Set<number>>(new Set());
+  const initializedRef = useRef(false);
+
   useEffect(() => {
-    if (!last) return;
+    // First pass: record whatever is already in state as "already seen"
+    // so we never burst on mount.
+    if (!initializedRef.current) {
+      initializedRef.current = true;
+      if (last?.ts) seenTsRef.current.add(last.ts);
+      return;
+    }
+    if (!last?.ts) return;
+    if (seenTsRef.current.has(last.ts)) return;
+    seenTsRef.current.add(last.ts);
+
+    // Cap the seen-set size to avoid unbounded growth over a long session.
+    if (seenTsRef.current.size > 200) {
+      const arr = Array.from(seenTsRef.current);
+      seenTsRef.current = new Set(arr.slice(-100));
+    }
+
     const id = ++nextId;
     const burst: Burst = {
       id,
       key: last.emoji,
-      x: 10 + Math.random() * 80, // viewport-% horizontal
+      x: 10 + Math.random() * 80,
       driftX: -40 + Math.random() * 80,
       scale: 0.9 + Math.random() * 0.5,
       rotate: -25 + Math.random() * 50,
       duration: 2400 + Math.random() * 1200,
     };
     setBursts((prev) => [...prev, burst]);
-    const timer = setTimeout(() => {
+    const timer = window.setTimeout(() => {
       setBursts((prev) => prev.filter((b) => b.id !== id));
     }, burst.duration + 200);
     return () => clearTimeout(timer);
-    // last.ts is part of the dependency so each new reaction fires a new burst.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [last?.ts]);
+  }, [last?.ts, last?.emoji]);
 
   if (bursts.length === 0) return null;
 
