@@ -83,6 +83,7 @@ export interface PublicRoomState {
 export type TeacherMessage =
   | { type: 'T_CREATE_ROOM'; payload: { classes?: string[] } }
   | { type: 'T_NEXT_PHASE'; payload: { token: string } }
+  | { type: 'T_PREV_PHASE'; payload: { token: string } }
   | { type: 'T_END_ACTIVE'; payload: { token: string } }
   | { type: 'T_CLOSE_ROOM'; payload: { token: string } }
   | { type: 'T_SET_DISTRIBUTION_VIEW'; payload: { token: string; view: 'all' | string } };
@@ -145,6 +146,12 @@ export function nextPhase(p: Phase): Phase {
   const i = PHASES.indexOf(p);
   if (i < 0 || i >= PHASES.length - 1) return p;
   return PHASES[i + 1];
+}
+
+export function prevPhase(p: Phase): Phase {
+  const i = PHASES.indexOf(p);
+  if (i <= 0) return p;
+  return PHASES[i - 1];
 }
 
 export function isActivePhase(p: Phase): p is 'stage1_active' | 'stage2_active' {

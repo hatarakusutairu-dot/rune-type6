@@ -12,6 +12,7 @@ import {
   createInternalRoomState,
   endActive,
   advancePhase,
+  rewindPhase,
   setWorkResult,
   toPublicState,
   type InternalRoomState,
@@ -146,6 +147,17 @@ export class RoomDO {
         const phase = advancePhase(this.room);
         this.broadcast({ type: 'PHASE_CHANGE', payload: { phase } });
         this.onPhaseEntered(prev, phase);
+        return;
+      }
+
+      case 'T_PREV_PHASE': {
+        if (!this.checkTeacher(ws, msg.payload.token)) return;
+        const prev = this.room.phase;
+        const phase = rewindPhase(this.room);
+        if (phase !== prev) {
+          this.broadcast({ type: 'PHASE_CHANGE', payload: { phase } });
+          this.onPhaseEntered(prev, phase);
+        }
         return;
       }
 

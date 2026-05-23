@@ -5,7 +5,7 @@ import type {
   Work1Scores,
   Work2Scores,
 } from '../shared/protocol';
-import { DEFAULT_CLASSES, PHASES, nextPhase } from '../shared/protocol';
+import { DEFAULT_CLASSES, PHASES, nextPhase, prevPhase } from '../shared/protocol';
 
 export interface InternalRoomState {
   code: string;
@@ -53,6 +53,11 @@ export function toPublicState(s: InternalRoomState): PublicRoomState {
 
 export function advancePhase(s: InternalRoomState): Phase {
   s.phase = nextPhase(s.phase);
+  return s.phase;
+}
+
+export function rewindPhase(s: InternalRoomState): Phase {
+  s.phase = prevPhase(s.phase);
   return s.phase;
 }
 

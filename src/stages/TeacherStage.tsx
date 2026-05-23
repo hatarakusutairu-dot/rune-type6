@@ -85,6 +85,10 @@ export default function TeacherStage() {
     if (!token) return;
     room.send({ type: 'T_NEXT_PHASE', payload: { token } });
   }
+  function prev() {
+    if (!token) return;
+    room.send({ type: 'T_PREV_PHASE', payload: { token } });
+  }
   function endActive() {
     if (!token) return;
     room.send({ type: 'T_END_ACTIVE', payload: { token } });
@@ -111,6 +115,14 @@ export default function TeacherStage() {
             </p>
           </div>
           <div className="flex gap-2">
+            <button
+              className="btn-ghost"
+              onClick={prev}
+              disabled={phase === 'lobby'}
+              title="ひとつ前のフェーズに戻る"
+            >
+              ← 前へ
+            </button>
             {isActive && (
               <button className="btn-ghost" onClick={endActive}>
                 締切
