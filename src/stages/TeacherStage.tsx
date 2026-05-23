@@ -11,9 +11,12 @@ import { WORK1_ORDER, WORK2_ORDER } from '../lib/scoring';
 
 const PHASE_LABELS: Record<string, string> = {
   lobby: 'ロビー',
+  stage0_title: 'タイトル',
   stage0_rules: 'ルール',
   stage0_theme: 'テーマ',
   stage0_flow: '今日の流れ',
+  stage0_work1title: 'WORK1 タイトル',
+  stage0_work1: 'WORK1 説明',
   stage1_active: 'ワーク1 回答中',
   stage1_results: 'ワーク1 結果',
   stage1_explain_1: '解説 コンペティター',
@@ -21,12 +24,15 @@ const PHASE_LABELS: Record<string, string> = {
   stage1_explain_3: '解説 ソーシャライザー',
   stage1_explain_4: '解説 エクスプローラー',
   stage1_bridge: 'ブリッジ',
+  stage2_work2title: 'WORK2 タイトル',
+  stage2_work2: 'WORK2 説明',
   stage2_active: 'ワーク2 回答中',
   stage2_results: 'ワーク2 結果',
   stage2_explain_1: '解説 アタッカー',
   stage2_explain_2: '解説 ガーディアン',
   stage2_explain_3: '解説 アナリスト',
   stage2_explain_4: '解説 ブースター',
+  stage3_type: '総合タイトル',
   stage3_summary: 'クロス集計',
   stage3_share: '共有タイム',
   stage3_comment: '感想入力',
@@ -150,6 +156,76 @@ function PhaseBody() {
           全員揃ったら右上の「次へ →」で開始 ▶
         </p>
       </section>
+    );
+  }
+
+  if (phase === 'stage0_title') {
+    return (
+      <SlideImage
+        phase="stage0_title"
+        fallback={<Slide title="TYPE SCANNER"><p className="text-3xl font-black">TYPE SCANNER</p></Slide>}
+      />
+    );
+  }
+
+  if (phase === 'stage0_work1title') {
+    return (
+      <SlideImage
+        phase="stage0_work1title"
+        fallback={<Slide title="WORK 1"><p className="text-3xl font-black">WORK 1</p></Slide>}
+      />
+    );
+  }
+
+  if (phase === 'stage0_work1') {
+    return (
+      <SlideImage
+        phase="stage0_work1"
+        fallback={
+          <Slide title="WORK 1 ─ 説明">
+            <p className="text-white/85">これから20問の質問に答えてください。直感で大丈夫。</p>
+          </Slide>
+        }
+      />
+    );
+  }
+
+  if (phase === 'stage2_work2title') {
+    return (
+      <SlideImage
+        phase="stage2_work2title"
+        fallback={<Slide title="WORK 2"><p className="text-3xl font-black">WORK 2</p></Slide>}
+      />
+    );
+  }
+
+  if (phase === 'stage2_work2') {
+    return (
+      <SlideImage
+        phase="stage2_work2"
+        fallback={
+          <Slide title="WORK 2 ─ 説明">
+            <p className="text-white/85">
+              ここからはチームでのピンチ場面を想像して答えてください。
+              チーム経験がなくても大丈夫。直感で選んでOK。
+            </p>
+          </Slide>
+        }
+      />
+    );
+  }
+
+  if (phase === 'stage3_type') {
+    return (
+      <SlideImage
+        phase="stage3_type"
+        fallback={
+          <Slide title="総合分析">
+            <p className="text-3xl font-black mb-2">2つを掛け合わせて</p>
+            <p className="text-white/80">あなただけのプレイヤータイプを見てみよう</p>
+          </Slide>
+        }
+      />
     );
   }
 

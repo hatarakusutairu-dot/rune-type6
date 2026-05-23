@@ -31,7 +31,7 @@ export default function SlideImage({ phase, fallback }: Props) {
   }, [phase]);
 
   if (status === 'checking') {
-    return <div className="opacity-0">{fallback}</div>;
+    return fallback ? <div className="opacity-0">{fallback}</div> : null;
   }
   if (status === 'have') {
     return (
