@@ -6,6 +6,7 @@ import CrossMatrix from '../components/CrossMatrix';
 import WordCloud from '../components/WordCloud';
 import TypeSlide from '../components/TypeSlide';
 import ClassLobby from '../components/ClassLobby';
+import SlideImage from '../components/SlideImage';
 import { WORK1_ORDER, WORK2_ORDER } from '../lib/scoring';
 
 const PHASE_LABELS: Record<string, string> = {
@@ -154,37 +155,52 @@ function PhaseBody() {
 
   if (phase === 'stage0_rules') {
     return (
-      <Slide title="ルール">
-        <ol className="space-y-3 text-2xl">
-          <li><span className="text-cyan-400 font-black">①</span> 診断結果に良い悪いはない。全部チームに必要なタイプ</li>
-          <li><span className="text-cyan-400 font-black">②</span> 否定しない・笑わない</li>
-          <li><span className="text-cyan-400 font-black">③</span> ここだけの話</li>
-        </ol>
-      </Slide>
+      <SlideImage
+        phase="stage0_rules"
+        fallback={
+          <Slide title="ルール">
+            <ol className="space-y-3 text-2xl">
+              <li><span className="text-cyan-400 font-black">①</span> 診断結果に良い悪いはない。全部チームに必要なタイプ</li>
+              <li><span className="text-cyan-400 font-black">②</span> 否定しない・笑わない</li>
+              <li><span className="text-cyan-400 font-black">③</span> ここだけの話</li>
+            </ol>
+          </Slide>
+        }
+      />
     );
   }
 
   if (phase === 'stage0_theme') {
     return (
-      <Slide title="今日のテーマ">
-        <p className="text-3xl font-black mb-3">他者理解</p>
-        <p className="text-xl text-white/80">"違い" を知ることがチームの第一歩</p>
-        <p className="mt-6 text-white/70">
-          同じゲーマーでも、楽しみ方もピンチの動き方も全然違う。
-        </p>
-      </Slide>
+      <SlideImage
+        phase="stage0_theme"
+        fallback={
+          <Slide title="今日のテーマ">
+            <p className="text-3xl font-black mb-3">他者理解</p>
+            <p className="text-xl text-white/80">"違い" を知ることがチームの第一歩</p>
+            <p className="mt-6 text-white/70">
+              同じゲーマーでも、楽しみ方もピンチの動き方も全然違う。
+            </p>
+          </Slide>
+        }
+      />
     );
   }
 
   if (phase === 'stage0_flow') {
     return (
-      <Slide title="今日の流れ">
-        <ul className="space-y-3 text-xl">
-          <li><span className="text-pink-400 font-black">WORK 1</span> ─ ゲーマータイプ診断（自分の楽しみ方を知る）</li>
-          <li><span className="text-cyan-400 font-black">WORK 2</span> ─ 危機対応タイプ診断（ピンチの自分を知る）</li>
-          <li><span className="text-yellow-300 font-black">TOTAL</span> ─ 総合分析（2つを掛け合わせた自分だけの結果）</li>
-        </ul>
-      </Slide>
+      <SlideImage
+        phase="stage0_flow"
+        fallback={
+          <Slide title="今日の流れ">
+            <ul className="space-y-3 text-xl">
+              <li><span className="text-pink-400 font-black">WORK 1</span> ─ ゲーマータイプ診断（自分の楽しみ方を知る）</li>
+              <li><span className="text-cyan-400 font-black">WORK 2</span> ─ 危機対応タイプ診断（ピンチの自分を知る）</li>
+              <li><span className="text-yellow-300 font-black">TOTAL</span> ─ 総合分析（2つを掛け合わせた自分だけの結果）</li>
+            </ul>
+          </Slide>
+        }
+      />
     );
   }
 
@@ -198,23 +214,28 @@ function PhaseBody() {
 
   if (phase.startsWith('stage1_explain')) {
     const t = EXPLAIN_TYPE_W1[phase];
-    return <TypeSlide typeId={t} />;
+    return <SlideImage phase={phase} fallback={<TypeSlide typeId={t} />} />;
   }
 
   if (phase.startsWith('stage2_explain')) {
     const t = EXPLAIN_TYPE_W2[phase];
-    return <TypeSlide typeId={t} />;
+    return <SlideImage phase={phase} fallback={<TypeSlide typeId={t} />} />;
   }
 
   if (phase === 'stage1_bridge') {
     return (
-      <Slide title="ワーク2へ">
-        <p className="text-white/85 leading-relaxed">
-          ワーク1では『普段のゲームとの向き合い方』を見ました。
-          次のワーク2では『チームでピンチの時にどう動くか』を見ていきます。
-          2つを掛け合わせることで、生徒それぞれのプレイヤータイプが見えてきます。
-        </p>
-      </Slide>
+      <SlideImage
+        phase="stage1_bridge"
+        fallback={
+          <Slide title="ワーク2へ">
+            <p className="text-white/85 leading-relaxed">
+              ワーク1では『普段のゲームとの向き合い方』を見ました。
+              次のワーク2では『チームでピンチの時にどう動くか』を見ていきます。
+              2つを掛け合わせることで、生徒それぞれのプレイヤータイプが見えてきます。
+            </p>
+          </Slide>
+        }
+      />
     );
   }
 
@@ -234,23 +255,33 @@ function PhaseBody() {
 
   if (phase === 'stage3_share') {
     return (
-      <Slide title="共有タイム">
-        <p className="text-3xl font-black mb-2">グループで結果を見せ合おう</p>
-        <p className="text-white/80">"同じだと思ってた？ 違った？" を話してみよう</p>
-      </Slide>
+      <SlideImage
+        phase="stage3_share"
+        fallback={
+          <Slide title="共有タイム">
+            <p className="text-3xl font-black mb-2">グループで結果を見せ合おう</p>
+            <p className="text-white/80">"同じだと思ってた？ 違った？" を話してみよう</p>
+          </Slide>
+        }
+      />
     );
   }
 
   if (phase === 'stage3_comment') {
     return (
-      <Slide title="今日の感想を一言で">
-        <p className="text-white/70">
-          スマホから感想を送ってください。次の画面でみんなの感想が表示されます。
-        </p>
-        <p className="mt-6 text-white/50 text-sm">
-          入室者 {room.studentCount} 名 / 感想 {room.events.cloud?.words.length ?? 0} 件
-        </p>
-      </Slide>
+      <SlideImage
+        phase="stage3_comment"
+        fallback={
+          <Slide title="今日の感想を一言で">
+            <p className="text-white/70">
+              スマホから感想を送ってください。次の画面でみんなの感想が表示されます。
+            </p>
+            <p className="mt-6 text-white/50 text-sm">
+              入室者 {room.studentCount} 名 / 感想 {room.events.cloud?.words.length ?? 0} 件
+            </p>
+          </Slide>
+        }
+      />
     );
   }
 
@@ -265,10 +296,15 @@ function PhaseBody() {
 
   if (phase === 'stage3_closing') {
     return (
-      <Slide title="まとめ">
-        <p className="text-3xl font-black mb-3">"違い" を知ることが、チームの第一歩</p>
-        <p className="text-white/80">今日知ったことを、どこかで思い出してくれたらOK</p>
-      </Slide>
+      <SlideImage
+        phase="stage3_closing"
+        fallback={
+          <Slide title="まとめ">
+            <p className="text-3xl font-black mb-3">"違い" を知ることが、チームの第一歩</p>
+            <p className="text-white/80">今日知ったことを、どこかで思い出してくれたらOK</p>
+          </Slide>
+        }
+      />
     );
   }
 
