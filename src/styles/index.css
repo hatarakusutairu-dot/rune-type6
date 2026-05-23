@@ -43,9 +43,10 @@
     height: 100%;
     min-height: 100vh;
   }
-  /* Reserve room at the bottom for the always-visible reaction bar. */
+  /* Reserve room at the bottom for the always-visible reaction bar.
+     Important so it wins over Tailwind's `p-*` utility on <main>. */
   main {
-    padding-bottom: 96px;
+    padding-bottom: 112px !important;
   }
   body {
     background:

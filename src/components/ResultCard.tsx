@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import RadarChart from './RadarChart';
 import { typeInfo } from '../data/typeInfo';
 import { WORK1_ORDER, WORK2_ORDER } from '../lib/scoring';
@@ -35,7 +34,6 @@ const COLORS: Record<string, string> = {
 };
 
 export default function ResultCard({ workId, scores, mainType, subType, tieWith }: Props) {
-  const [expanded, setExpanded] = useState(false);
   const order = workId === 1 ? [...WORK1_ORDER] : [...WORK2_ORDER];
   const labels = workId === 1 ? LABELS_W1 : LABELS_W2;
   const isBalanced = mainType === 'balanced';
@@ -88,20 +86,8 @@ export default function ResultCard({ workId, scores, mainType, subType, tieWith 
         ※ 今日の回答での傾向です。固定的な性格分類ではありません。
       </p>
 
-      {(hasDetail || isBalanced) && (
-        <button onClick={() => setExpanded((v) => !v)} className="btn-ghost w-full">
-          {expanded ? '閉じる' : '詳しく見る'}
-        </button>
-      )}
-
-      {!hasDetail && !isBalanced && (
-        <p className="text-white/50 text-xs text-center">
-          このあと両方のワークが終わると、もっと詳しい総合分析が見られるよ ✨
-        </p>
-      )}
-
-      {expanded && !isBalanced && main && hasDetail && (
-        <div className="mt-5 space-y-4 text-sm">
+      {!isBalanced && main && hasDetail && (
+        <div className="mt-2 space-y-4 text-sm">
           <DetailSection emoji="💬" title="燃える言葉" items={main.motivators} />
           <DetailSection emoji="🚫" title="やる気なくす言葉" items={main.demotivators} />
           <DetailSection emoji="⚡" title="調子いい時のサイン" items={main.goodSigns} />
@@ -118,8 +104,8 @@ export default function ResultCard({ workId, scores, mainType, subType, tieWith 
         </div>
       )}
 
-      {expanded && isBalanced && (
-        <div className="mt-5 text-sm text-white/80 space-y-2">
+      {isBalanced && (
+        <div className="mt-2 text-sm text-white/80 space-y-2">
           <p>
             4タイプすべてのスコアが近い、バランス型の傾向です。
             状況や相手に合わせて柔軟に役割を変えられるのが強みです。

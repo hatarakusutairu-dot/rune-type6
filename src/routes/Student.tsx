@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useRoom } from '../RoomContext';
-import { loadState } from '../lib/storage';
+import { ensureRoom, loadState } from '../lib/storage';
 import StudentStage from '../stages/StudentStage';
 
 export default function Student() {
@@ -34,10 +34,12 @@ export default function Student() {
 
   function handleJoin() {
     if (!code || !className) return;
-    const saved = loadState();
+    // If the student is joining a *different* room than last time, wipe out
+    // stale work1/work2/comment so they don't see fake results.
+    const fresh = ensureRoom(code);
     room.send({
       type: 'S_JOIN',
-      payload: { code, className, sid: saved.sid },
+      payload: { code, className, sid: fresh.sid },
     });
     setJoined(true);
   }

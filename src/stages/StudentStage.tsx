@@ -325,7 +325,6 @@ function CombinedResult() {
   const w1 = persisted.work1;
   const w2 = persisted.work2;
   const combo = w1?.mainType && w2?.mainType ? getCombo(w1.mainType, w2.mainType) : null;
-  const [expanded, setExpanded] = useState(false);
 
   return (
     <div className="space-y-4">
@@ -341,26 +340,18 @@ function CombinedResult() {
             {combo.catchcopy}
           </h3>
           <p className="text-white/80 text-sm mt-2 leading-relaxed">{combo.description}</p>
-          <button
-            onClick={() => setExpanded((v) => !v)}
-            className="btn-ghost w-full mt-4"
-          >
-            {expanded ? '閉じる' : '詳しく見る'}
-          </button>
-          {expanded && (
-            <div className="mt-4 space-y-3 text-sm">
-              <Detail emoji="💬" title="燃える言葉" items={combo.motivators} />
-              <Detail emoji="🚫" title="やる気なくす言葉" items={combo.demotivators} />
-              <Detail emoji="⚡" title="調子いいサイン" items={combo.goodSigns} />
-              <Detail emoji="📉" title="調子悪いサイン" items={combo.badSigns} />
-              {combo.helpfulActions && (
-                <DetailPara emoji="🤝" title="助かるフォロー" body={combo.helpfulActions} />
-              )}
-              {combo.teamRole && (
-                <DetailPara emoji="🎮" title="チームでの活かし方" body={combo.teamRole} />
-              )}
-            </div>
-          )}
+          <div className="mt-4 space-y-3 text-sm">
+            <Detail emoji="💬" title="燃える言葉" items={combo.motivators} />
+            <Detail emoji="🚫" title="やる気なくす言葉" items={combo.demotivators} />
+            <Detail emoji="⚡" title="調子いいサイン" items={combo.goodSigns} />
+            <Detail emoji="📉" title="調子悪いサイン" items={combo.badSigns} />
+            {combo.helpfulActions && (
+              <DetailPara emoji="🤝" title="助かるフォロー" body={combo.helpfulActions} />
+            )}
+            {combo.teamRole && (
+              <DetailPara emoji="🎮" title="チームでの活かし方" body={combo.teamRole} />
+            )}
+          </div>
         </article>
       )}
 

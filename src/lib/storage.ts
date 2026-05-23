@@ -65,3 +65,24 @@ export function patchWork(workId: 1 | 2, patch: Partial<PersistedWork>): Persist
 export function clearState() {
   safeWrite({ ...DEFAULT_STATE });
 }
+
+/**
+ * Discard any work / comment data when the student joins a different room than
+ * the one stored locally. Keeps `sid` so the server still recognises the device.
+ */
+export function ensureRoom(nextCode: string): PersistedState {
+  const cur = safeRead();
+  if (cur.roomCode && cur.roomCode !== nextCode) {
+    const next: PersistedState = {
+      version: VERSION,
+      sid: cur.sid,
+      roomCode: nextCode,
+    };
+    safeWrite(next);
+    return next;
+  }
+  // Same room or no previous room — just record the code and keep existing work.
+  const next = { ...cur, roomCode: nextCode, version: VERSION };
+  safeWrite(next);
+  return next;
+}
