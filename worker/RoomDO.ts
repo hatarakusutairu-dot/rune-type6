@@ -53,15 +53,6 @@ export class RoomDO {
       const attachment: Attachment = { role: 'pending' };
       this.state.acceptWebSocket(server);
       server.serializeAttachment(attachment);
-      // Push initial public state so anonymous clients (e.g. the student join screen)
-      // can see which classes the teacher selected before sending S_JOIN.
-      try {
-        server.send(
-          JSON.stringify({ type: 'STATE', payload: { state: toPublicState(this.room) } }),
-        );
-      } catch {
-        // ignored
-      }
       return new Response(null, { status: 101, webSocket: client });
     }
 
@@ -83,6 +74,10 @@ export class RoomDO {
     switch (msg.type) {
       case 'PING':
         this.sendTo(ws, { type: 'PONG', payload: {} });
+        return;
+
+      case 'HELLO':
+        this.sendTo(ws, { type: 'STATE', payload: { state: toPublicState(this.room) } });
         return;
 
       case 'S_JOIN': {

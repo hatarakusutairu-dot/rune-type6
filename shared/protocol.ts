@@ -96,7 +96,8 @@ export type StudentMessage =
 
 export type CommonMessage =
   | { type: 'REACTION'; payload: { emoji: string } }
-  | { type: 'PING'; payload: {} };
+  | { type: 'PING'; payload: {} }
+  | { type: 'HELLO'; payload: {} };
 
 export type ClientMessage = TeacherMessage | StudentMessage | CommonMessage;
 

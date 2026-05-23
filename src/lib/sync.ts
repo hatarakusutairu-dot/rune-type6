@@ -36,6 +36,12 @@ export function connect({ code, onMessage, onStatus }: SyncOptions): SyncHandle 
     ws.addEventListener('open', () => {
       attempt = 0;
       onStatus('open');
+      // Greet immediately so the server pushes the current room STATE to us.
+      try {
+        ws?.send(JSON.stringify({ type: 'HELLO', payload: {} }));
+      } catch {
+        // ignored
+      }
       clearPing();
       pingTimer = setInterval(() => {
         try {
