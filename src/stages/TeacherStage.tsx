@@ -132,8 +132,8 @@ export default function TeacherStage() {
             <button className="btn-primary" onClick={next} disabled={phase === 'closed'}>
               次へ →
             </button>
-            <button className="btn-ghost" onClick={close}>
-              終了
+            <button className="btn-danger" onClick={close}>
+              授業終了
             </button>
           </div>
         </header>
