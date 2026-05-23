@@ -11,12 +11,75 @@ export default function StudentStage() {
   const phase = room.phase;
   const persisted = loadState();
 
-  if (phase === 'lobby' || phase.startsWith('stage0')) {
+  if (phase === 'lobby') {
     return (
       <Center>
+        <div className="text-5xl mb-3 animate-pulse">🎮</div>
         <h2 className="text-2xl font-bold mb-2">入室しました</h2>
         <p className="text-white/70">講師の合図をお待ちください。</p>
         <p className="text-white/40 text-xs mt-6">クラス：{room.self?.className ?? '-'}</p>
+      </Center>
+    );
+  }
+
+  if (phase === 'stage0_rules') {
+    return (
+      <Center>
+        <p className="text-white/40 text-xs mb-3">RULES</p>
+        <h2 className="text-2xl font-black mb-4">きょうのルール</h2>
+        <ol className="space-y-3 text-left text-sm">
+          <li className="flex gap-2">
+            <span className="text-cyan-400 font-black">①</span>
+            <span>診断結果に良い悪いはない。全部チームに必要なタイプ</span>
+          </li>
+          <li className="flex gap-2">
+            <span className="text-cyan-400 font-black">②</span>
+            <span>否定しない・笑わない</span>
+          </li>
+          <li className="flex gap-2">
+            <span className="text-cyan-400 font-black">③</span>
+            <span>ここだけの話</span>
+          </li>
+        </ol>
+        <p className="text-white/40 text-xs mt-6">クラス：{room.self?.className ?? '-'}</p>
+      </Center>
+    );
+  }
+
+  if (phase === 'stage0_theme') {
+    return (
+      <Center>
+        <p className="text-white/40 text-xs mb-3">THEME</p>
+        <h2 className="text-3xl font-black mb-2 bg-gradient-to-r from-fuchsia-400 to-cyan-300 bg-clip-text text-transparent">
+          他者理解
+        </h2>
+        <p className="text-white/80 text-sm">
+          "違い" を知ることがチームの第一歩
+        </p>
+        <p className="text-white/50 text-xs mt-4">
+          同じゲーマーでも、楽しみ方もピンチの動き方も全然違う。
+        </p>
+      </Center>
+    );
+  }
+
+  if (phase === 'stage0_flow') {
+    return (
+      <Center>
+        <p className="text-white/40 text-xs mb-3">FLOW</p>
+        <h2 className="text-2xl font-black mb-4">きょうの流れ</h2>
+        <ul className="space-y-2 text-left text-sm">
+          <li>
+            <span className="text-pink-400 font-black">WORK 1</span> ─ ゲーマータイプ診断
+          </li>
+          <li>
+            <span className="text-cyan-400 font-black">WORK 2</span> ─ 危機対応タイプ診断
+          </li>
+          <li>
+            <span className="text-yellow-300 font-black">TOTAL</span> ─ 総合分析
+          </li>
+        </ul>
+        <p className="text-white/40 text-xs mt-6">準備できたら講師の合図を待ってね</p>
       </Center>
     );
   }
@@ -239,9 +302,16 @@ function Page({ children }: { children: React.ReactNode }) {
 }
 
 function Center({ children }: { children: React.ReactNode }) {
+  const phase = useRoom().phase;
   return (
     <main className="min-h-screen flex items-center justify-center p-6">
-      <div className="panel max-w-md w-full text-center">{children}</div>
+      <div
+        key={phase}
+        className="panel max-w-md w-full text-center animate-[fadein_400ms_ease-out]"
+        style={{ animationName: 'fadein' }}
+      >
+        {children}
+      </div>
     </main>
   );
 }
