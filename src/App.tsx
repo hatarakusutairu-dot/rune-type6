@@ -3,6 +3,8 @@ import { RoomProvider } from './RoomContext';
 import Landing from './routes/Landing';
 import Teacher from './routes/Teacher';
 import Student from './routes/Student';
+import ReactionPanel from './components/ReactionPanel';
+import ReactionBurst from './components/ReactionBurst';
 
 export default function App() {
   return (
@@ -14,6 +16,8 @@ export default function App() {
           <Route path="/student" element={<Student />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        <ReactionBurst />
+        <ReactionPanel />
       </HashRouter>
     </RoomProvider>
   );

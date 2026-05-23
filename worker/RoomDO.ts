@@ -21,6 +21,7 @@ import {
 interface Attachment {
   role: 'teacher' | 'student' | 'pending';
   sid?: string;
+  lastReactionAt?: number;
 }
 
 export class RoomDO {
@@ -217,7 +218,13 @@ export class RoomDO {
       }
 
       case 'REACTION': {
-        this.broadcast({ type: 'REACTION_BURST', payload: { emoji: msg.payload.emoji } });
+        const now = Date.now();
+        if (attachment.lastReactionAt && now - attachment.lastReactionAt < 400) return;
+        attachment.lastReactionAt = now;
+        ws.serializeAttachment(attachment);
+        const raw = String(msg.payload.emoji ?? '').slice(0, 32);
+        if (!raw) return;
+        this.broadcast({ type: 'REACTION_BURST', payload: { emoji: raw } });
         return;
       }
     }
