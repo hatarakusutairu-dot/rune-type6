@@ -39,8 +39,7 @@ const PHASE_LABELS: Record<string, string> = {
   stage3_comment: '感想入力',
   stage3_wordcloud: 'ワードクラウド',
   stage3_closing: 'まとめ',
-  stage3_survey: 'アンケート',
-  closed: '終了',
+  closed: 'アンケート',
 };
 
 const LABELS_W1: Record<string, string> = {
@@ -398,16 +397,9 @@ function PhaseBody() {
     );
   }
 
-  if (phase === 'stage3_survey') {
-    return <SurveyQR />;
-  }
 
   if (phase === 'closed') {
-    return (
-      <Slide title="セッション終了">
-        <p className="text-white/70">お疲れさまでした。</p>
-      </Slide>
-    );
+    return <SurveyQR />;
   }
 
   return (

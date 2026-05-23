@@ -296,22 +296,13 @@ export default function StudentStage() {
     );
   }
 
-  if (phase === 'stage3_survey') {
+  if (phase === 'closed') {
     return (
       <main key={phase} className="min-h-screen p-4 sm:p-6 animate-[fadein_400ms_ease-out]">
         <div className="max-w-xl mx-auto">
           <SurveyQR />
         </div>
       </main>
-    );
-  }
-
-  if (phase === 'closed') {
-    return (
-      <Center>
-        <h2 className="text-2xl font-bold mb-2">セッション終了</h2>
-        <p className="text-white/70">お疲れさまでした。</p>
-      </Center>
     );
   }
 
