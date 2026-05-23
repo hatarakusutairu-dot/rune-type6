@@ -16,14 +16,21 @@ export default function Student() {
     room.setRole('student');
   }, [room]);
 
-  const classes = useMemo(() => room.state?.classes ?? [], [room.state]);
-
   // If we have a code in the URL, connect immediately so we can fetch classes/state.
   useEffect(() => {
     if (code && /^[0-9]{6}$/.test(code) && room.status === 'idle') {
       room.connectToRoom(code);
     }
   }, [code, room]);
+
+  const classes = useMemo(() => room.state?.classes ?? [], [room.state]);
+
+  // Reset selected class if it isn't in the teacher's list anymore.
+  useEffect(() => {
+    if (classes.length > 0 && className && !classes.includes(className)) {
+      setClassName('');
+    }
+  }, [classes, className]);
 
   function handleJoin() {
     if (!code || !className) return;
@@ -34,6 +41,14 @@ export default function Student() {
     });
     setJoined(true);
   }
+
+  const statusLabel: Record<typeof room.status, string> = {
+    idle: 'コードを入力してね',
+    connecting: '接続中…',
+    open: classes.length === 0 ? 'ルーム情報を取得中…' : '入室する',
+    closed: '接続が切れました。再接続中…',
+    error: '接続エラー。再接続中…',
+  };
 
   if (!joined || !room.state) {
     return (
@@ -46,33 +61,42 @@ export default function Student() {
             onChange={(e) => setCode(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
             inputMode="numeric"
             placeholder="6桁"
-            className="w-full mb-4 rounded-lg bg-bg-700 border border-white/10 px-3 py-2 font-mono"
+            className="w-full mb-4 rounded-lg bg-bg-700 border border-white/10 px-3 py-2 font-mono text-lg tracking-widest"
           />
-          <label className="block text-sm text-white/70 mb-1">クラス</label>
-          <div className="grid grid-cols-2 gap-2 mb-6">
-            {(classes.length > 0
-              ? classes
-              : ['梅田第1', '梅田第2', '梅田7F', '名古屋', '岡山']
-            ).map((c) => (
-              <button
-                key={c}
-                onClick={() => setClassName(c)}
-                className={`rounded-lg px-3 py-2 border ${
-                  className === c
-                    ? 'border-cyan-400 bg-cyan-400/10'
-                    : 'border-white/20 bg-white/5'
-                }`}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
+          {classes.length > 0 ? (
+            <>
+              <label className="block text-sm text-white/70 mb-1">クラス</label>
+              <div className="grid grid-cols-2 gap-2 mb-6">
+                {classes.map((c) => (
+                  <button
+                    key={c}
+                    onClick={() => setClassName(c)}
+                    className={`rounded-lg px-3 py-2 border font-bold transition ${
+                      className === c
+                        ? 'border-cyan-400 bg-cyan-400/15 shadow-neon'
+                        : 'border-white/20 bg-white/5 hover:bg-white/10'
+                    }`}
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : (
+            <p className="text-white/60 text-sm mb-6 text-center">
+              {room.status === 'open'
+                ? 'クラス情報を取得しています…'
+                : 'ルームに接続しています…'}
+            </p>
+          )}
           <button
             onClick={handleJoin}
-            disabled={!code || !className || room.status !== 'open'}
+            disabled={!code || !className || room.status !== 'open' || classes.length === 0}
             className="btn-primary w-full"
           >
-            {room.status === 'open' ? '入室する' : `接続中…(${room.status})`}
+            {room.status === 'open' && classes.length > 0 && className
+              ? '入室する'
+              : statusLabel[room.status]}
           </button>
           {room.lastError && <p className="mt-3 text-red-400 text-sm">{room.lastError}</p>}
         </div>
