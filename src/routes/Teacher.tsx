@@ -29,15 +29,9 @@ export default function Teacher() {
       const { code, teacherToken } = await createRoom(selected);
       room.setTeacherToken(teacherToken);
       room.setCode(code);
+      // Arm BEFORE connecting so the very first on-open fires T_CREATE_ROOM, and so do all reconnects.
+      room.armTeacherClaim(teacherToken);
       room.connectToRoom(code);
-      const start = Date.now();
-      const tryClaim = () => {
-        if (Date.now() - start > 5000) return;
-        room.send({ type: 'T_CREATE_ROOM', payload: {} });
-      };
-      setTimeout(tryClaim, 200);
-      setTimeout(tryClaim, 600);
-      setTimeout(tryClaim, 1500);
       setStep('ready');
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));

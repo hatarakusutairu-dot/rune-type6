@@ -47,12 +47,14 @@ const LABELS_W1: Record<string, string> = {
   achiever: 'アチーバー',
   socializer: 'ソーシャライザー',
   explorer: 'エクスプローラー',
+  balanced: 'バランス型',
 };
 const LABELS_W2: Record<string, string> = {
   attacker: 'アタッカー',
   guardian: 'ガーディアン',
   analyst: 'アナリスト',
   booster: 'ブースター',
+  balanced: 'バランス型',
 };
 const COLORS: Record<string, string> = {
   competitor: '#FF4444',
@@ -63,6 +65,7 @@ const COLORS: Record<string, string> = {
   guardian: '#00BCD4',
   analyst: '#AA00FF',
   booster: '#FF4081',
+  balanced: '#9CA3AF',
 };
 
 const EXPLAIN_TYPE_W1: Record<string, string> = {
@@ -96,7 +99,14 @@ export default function TeacherStage() {
   }
   function close() {
     if (!token) return;
-    if (!confirm('セッションを終了しますか？')) return;
+    const phaseNow = room.phase;
+    const earlyExit = !phaseNow.startsWith('stage3') && phaseNow !== 'closed';
+    const message = earlyExit
+      ? `まだ最終フェーズに到達していません（現在：${PHASE_LABELS[phaseNow] ?? phaseNow}）。\n` +
+        '今ここで授業を終了すると、生徒の画面が一斉にアンケートQRに切り替わります。\n' +
+        '本当に終了しますか？'
+      : 'セッションを終了しますか？';
+    if (!confirm(message)) return;
     room.send({ type: 'T_CLOSE_ROOM', payload: { token } });
   }
 
@@ -501,7 +511,12 @@ function DistributionView({ workId }: { workId: 1 | 2 }) {
         ))}
       </div>
       {data ? (
-        <Distribution data={shown} order={[...order]} labels={labels} colors={COLORS} />
+        <Distribution
+          data={shown}
+          order={(shown.balanced ?? 0) > 0 ? [...order, 'balanced'] : [...order]}
+          labels={labels}
+          colors={COLORS}
+        />
       ) : (
         <p className="text-white/60 text-sm">集計中…</p>
       )}

@@ -19,22 +19,22 @@ export default function ReactionBurst() {
   const last = room.events.lastReaction;
   const [bursts, setBursts] = useState<Burst[]>([]);
 
-  const seenTsRef = useRef<Set<number>>(new Set());
+  const seenSeqRef = useRef<Set<number>>(new Set());
   const initializedRef = useRef(false);
 
   useEffect(() => {
     if (!initializedRef.current) {
       initializedRef.current = true;
-      if (last?.ts) seenTsRef.current.add(last.ts);
+      if (last?.seq) seenSeqRef.current.add(last.seq);
       return;
     }
-    if (!last?.ts) return;
-    if (seenTsRef.current.has(last.ts)) return;
-    seenTsRef.current.add(last.ts);
+    if (!last?.seq) return;
+    if (seenSeqRef.current.has(last.seq)) return;
+    seenSeqRef.current.add(last.seq);
 
-    if (seenTsRef.current.size > 200) {
-      const arr = Array.from(seenTsRef.current);
-      seenTsRef.current = new Set(arr.slice(-100));
+    if (seenSeqRef.current.size > 200) {
+      const arr = Array.from(seenSeqRef.current);
+      seenSeqRef.current = new Set(arr.slice(-100));
     }
 
     const id = ++nextId;
@@ -52,7 +52,7 @@ export default function ReactionBurst() {
       setBursts((prev) => prev.filter((b) => b.id !== id));
     }, burst.duration + 200);
     return () => clearTimeout(timer);
-  }, [last?.ts, last?.emoji]);
+  }, [last?.seq, last?.emoji]);
 
   if (bursts.length === 0) return null;
 

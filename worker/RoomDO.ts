@@ -27,6 +27,7 @@ interface Attachment {
 export class RoomDO {
   private state: DurableObjectState;
   private room: InternalRoomState | null = null;
+  private reactionSeq = 0;
 
   constructor(state: DurableObjectState) {
     this.state = state;
@@ -128,10 +129,13 @@ export class RoomDO {
       }
 
       case 'T_CREATE_ROOM': {
-        // The teacher socket "claims" the room by presenting the teacherToken via a separate
-        // POST to /api/rooms. Here we authenticate the WebSocket as teacher when the very first
-        // teacher message arrives — but only if no token check is required (single classroom).
-        // Token-based auth is enforced for state-mutating actions below.
+        if (msg.payload.teacherToken !== this.room.teacherToken) {
+          this.sendTo(ws, {
+            type: 'ERROR',
+            payload: { code: 'UNAUTHORIZED', message: '権限がありません' },
+          });
+          return;
+        }
         attachment.role = 'teacher';
         ws.serializeAttachment(attachment);
         this.sendTo(ws, {
@@ -197,6 +201,20 @@ export class RoomDO {
           return;
         }
         const { workId, scores, mainType, subType } = msg.payload;
+        if (workId !== 1 && workId !== 2) {
+          this.sendTo(ws, {
+            type: 'ERROR',
+            payload: { code: 'BAD_WORKID', message: 'workId が不正です' },
+          });
+          return;
+        }
+        if (typeof mainType !== 'string' || typeof subType !== 'string' || !scores || typeof scores !== 'object') {
+          this.sendTo(ws, {
+            type: 'ERROR',
+            payload: { code: 'BAD_PAYLOAD', message: 'ペイロードが不正です' },
+          });
+          return;
+        }
         setWorkResult(this.room, sid, workId, scores, mainType, subType);
         // Live progress to teacher(s) during active phase.
         this.broadcastTeachers({
@@ -207,7 +225,8 @@ export class RoomDO {
       }
 
       case 'S_COMMENT': {
-        const text = msg.payload.text.trim().slice(0, 80);
+        const raw = msg.payload?.text;
+        const text = typeof raw === 'string' ? raw.trim().slice(0, 80) : '';
         if (text.length === 0) return;
         this.room.comments.push(text);
         this.broadcastTeachers({
@@ -222,9 +241,10 @@ export class RoomDO {
         if (attachment.lastReactionAt && now - attachment.lastReactionAt < 400) return;
         attachment.lastReactionAt = now;
         ws.serializeAttachment(attachment);
-        const raw = String(msg.payload.emoji ?? '').slice(0, 32);
-        if (!raw) return;
-        this.broadcast({ type: 'REACTION_BURST', payload: { emoji: raw } });
+        const emoji = String(msg.payload.emoji ?? '').slice(0, 32);
+        if (!emoji) return;
+        this.reactionSeq += 1;
+        this.broadcast({ type: 'REACTION_BURST', payload: { emoji, seq: this.reactionSeq } });
         return;
       }
     }

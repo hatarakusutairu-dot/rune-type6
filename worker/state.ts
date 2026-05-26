@@ -5,7 +5,7 @@ import type {
   Work1Scores,
   Work2Scores,
 } from '../shared/protocol';
-import { DEFAULT_CLASSES, PHASES, nextPhase, prevPhase } from '../shared/protocol';
+import { DEFAULT_CLASSES, PHASES, isActivePhase, nextPhase, prevPhase } from '../shared/protocol';
 
 export interface InternalRoomState {
   code: string;
@@ -57,7 +57,15 @@ export function advancePhase(s: InternalRoomState): Phase {
 }
 
 export function rewindPhase(s: InternalRoomState): Phase {
-  s.phase = prevPhase(s.phase);
+  // Skip back past active phases so late joiners can't mutate already-finalized results.
+  let p = prevPhase(s.phase);
+  let guard = PHASES.length;
+  while (isActivePhase(p) && guard-- > 0) {
+    const next = prevPhase(p);
+    if (next === p) break;
+    p = next;
+  }
+  s.phase = p;
   return s.phase;
 }
 
@@ -82,7 +90,7 @@ export function computeProgress(s: InternalRoomState, workId: 1 | 2) {
   let count = 0;
   let total = 0;
   for (const st of s.students.values()) {
-    if (!st.online) continue;
+    // Include offline students: someone who answered then closed their tab is still "done".
     const bucket = perClass[st.className] ?? (perClass[st.className] = { count: 0, total: 0 });
     bucket.total += 1;
     total += 1;

@@ -4,6 +4,8 @@ export interface SyncOptions {
   code: string;
   onMessage: (msg: ServerMessage) => void;
   onStatus: (status: 'connecting' | 'open' | 'closed' | 'error') => void;
+  /** Fired after HELLO on every (re)open, so callers can re-issue S_JOIN / T_CREATE_ROOM. */
+  onOpen?: () => void;
 }
 
 export interface SyncHandle {
@@ -11,7 +13,7 @@ export interface SyncHandle {
   close: () => void;
 }
 
-export function connect({ code, onMessage, onStatus }: SyncOptions): SyncHandle {
+export function connect({ code, onMessage, onStatus, onOpen }: SyncOptions): SyncHandle {
   let ws: WebSocket | null = null;
   let closed = false;
   let attempt = 0;
@@ -39,6 +41,11 @@ export function connect({ code, onMessage, onStatus }: SyncOptions): SyncHandle 
       // Greet immediately so the server pushes the current room STATE to us.
       try {
         ws?.send(JSON.stringify({ type: 'HELLO', payload: {} }));
+      } catch {
+        // ignored
+      }
+      try {
+        onOpen?.();
       } catch {
         // ignored
       }

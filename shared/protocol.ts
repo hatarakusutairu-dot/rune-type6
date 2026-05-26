@@ -81,7 +81,7 @@ export interface PublicRoomState {
 // ----- Messages -----
 
 export type TeacherMessage =
-  | { type: 'T_CREATE_ROOM'; payload: { classes?: string[] } }
+  | { type: 'T_CREATE_ROOM'; payload: { teacherToken: string } }
   | { type: 'T_NEXT_PHASE'; payload: { token: string } }
   | { type: 'T_PREV_PHASE'; payload: { token: string } }
   | { type: 'T_END_ACTIVE'; payload: { token: string } }
@@ -136,7 +136,7 @@ export type ServerMessage =
   | { type: 'CROSS_MATRIX'; payload: { matrix: Record<string, Record<string, number>>; balanced: number } }
   | { type: 'COMMENT_CLOUD'; payload: { words: { text: string; count: number }[] } }
   | { type: 'STUDENT_COUNT'; payload: { count: number; perClass: Record<string, number> } }
-  | { type: 'REACTION_BURST'; payload: { emoji: string } }
+  | { type: 'REACTION_BURST'; payload: { emoji: string; seq: number } }
   | { type: 'ERROR'; payload: { code: string; message: string } }
   | { type: 'PONG'; payload: {} };
 

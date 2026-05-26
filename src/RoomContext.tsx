@@ -23,6 +23,8 @@ interface RoomCtxValue {
   send: (msg: ClientMessage) => void;
   connectToRoom: (code: string) => void;
   disconnect: () => void;
+  /** Teacher.tsx calls this with the teacherToken so the socket auto-claims on (re)open. */
+  armTeacherClaim: (token: string | null) => void;
   events: ServerEvents;
 }
 
@@ -31,7 +33,13 @@ interface ServerEvents {
   distribution?: Extract<ServerMessage, { type: 'WORK_DISTRIBUTION' }>['payload'];
   cross?: Extract<ServerMessage, { type: 'CROSS_MATRIX' }>['payload'];
   cloud?: Extract<ServerMessage, { type: 'COMMENT_CLOUD' }>['payload'];
-  lastReaction?: { emoji: string; ts: number };
+  lastReaction?: { emoji: string; seq: number };
+}
+
+interface RejoinInfo {
+  code: string;
+  className: string;
+  sid: string;
 }
 
 const RoomCtx = createContext<RoomCtxValue | null>(null);
@@ -56,6 +64,8 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
   const [events, setEvents] = useState<ServerEvents>({});
 
   const handleRef = useRef<SyncHandle | null>(null);
+  const rejoinRef = useRef<RejoinInfo | null>(null);
+  const teacherClaimRef = useRef<string | null>(null);
 
   const phase: Phase = state?.phase ?? 'lobby';
   const studentCount = state?.studentCount ?? 0;
@@ -77,6 +87,13 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
         setState(msg.payload.state);
         setSelf(msg.payload.self);
         patchState({ sid: msg.payload.sid, roomCode: msg.payload.state.code });
+        if (msg.payload.self) {
+          rejoinRef.current = {
+            code: msg.payload.state.code,
+            className: msg.payload.self.className,
+            sid: msg.payload.sid,
+          };
+        }
         break;
       case 'STATE':
         setState(msg.payload.state);
@@ -102,7 +119,10 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
         setEvents((e) => ({ ...e, cloud: msg.payload }));
         break;
       case 'REACTION_BURST':
-        setEvents((e) => ({ ...e, lastReaction: { emoji: msg.payload.emoji, ts: Date.now() } }));
+        setEvents((e) => ({
+          ...e,
+          lastReaction: { emoji: msg.payload.emoji, seq: msg.payload.seq },
+        }));
         break;
       case 'ERROR':
         setLastError(`${msg.payload.code}: ${msg.payload.message}`);
@@ -121,6 +141,20 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
         code: c,
         onMessage: handleMessage,
         onStatus: setStatus,
+        onOpen: () => {
+          // Re-establish role on every (re)open so reconnects don't leave the socket as 'pending'.
+          const claim = teacherClaimRef.current;
+          if (claim) {
+            handleRef.current?.send({ type: 'T_CREATE_ROOM', payload: { teacherToken: claim } });
+          }
+          const rj = rejoinRef.current;
+          if (rj && rj.code === c) {
+            handleRef.current?.send({
+              type: 'S_JOIN',
+              payload: { code: rj.code, className: rj.className, sid: rj.sid },
+            });
+          }
+        },
       });
     },
     [handleMessage],
@@ -129,9 +163,15 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
   const disconnect = useCallback(() => {
     handleRef.current?.close();
     handleRef.current = null;
+    rejoinRef.current = null;
+    teacherClaimRef.current = null;
     setStatus('idle');
     setState(null);
     setSelf(null);
+  }, []);
+
+  const armTeacherClaim = useCallback((token: string | null) => {
+    teacherClaimRef.current = token;
   }, []);
 
   useEffect(() => () => handleRef.current?.close(), []);
@@ -159,6 +199,7 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
       send,
       connectToRoom,
       disconnect,
+      armTeacherClaim,
       events,
     }),
     [
@@ -176,6 +217,7 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
       send,
       connectToRoom,
       disconnect,
+      armTeacherClaim,
       events,
     ],
   );
