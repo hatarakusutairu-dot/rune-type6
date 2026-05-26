@@ -1,4 +1,4 @@
-import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { RoomProvider } from './RoomContext';
 import Landing from './routes/Landing';
 import Teacher from './routes/Teacher';
@@ -9,7 +9,7 @@ import ReactionBurst from './components/ReactionBurst';
 export default function App() {
   return (
     <RoomProvider>
-      <HashRouter>
+      <BrowserRouter>
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/teacher" element={<Teacher />} />
@@ -18,7 +18,7 @@ export default function App() {
         </Routes>
         <ReactionBurst />
         <ReactionBar />
-      </HashRouter>
+      </BrowserRouter>
     </RoomProvider>
   );
 }
