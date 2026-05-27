@@ -4,6 +4,7 @@ import Quiz from '../components/Quiz';
 import ResultCard from '../components/ResultCard';
 import SlideImage from '../components/SlideImage';
 import SurveyQR from '../components/SurveyQR';
+import { useCountdown } from '../components/Countdown';
 import { work1Questions } from '../data/work1Questions';
 import { work2Questions } from '../data/work2Questions';
 import { getCombo } from '../data/comboAnalysis';
@@ -417,10 +418,12 @@ function CommentForm() {
   const room = useRoom();
   const [text, setText] = useState('');
   const [sent, setSent] = useState(false);
+  const remaining = useCountdown(90);
+  const expired = remaining <= 0;
 
   function submit() {
     const t = text.trim();
-    if (!t) return;
+    if (!t || expired) return;
     room.send({ type: 'S_COMMENT', payload: { text: t } });
     setSent(true);
   }
@@ -436,20 +439,32 @@ function CommentForm() {
 
   return (
     <div className="panel max-w-md w-full mx-auto">
-      <h2 className="text-xl font-bold mb-3">今日の感想を一言で</h2>
+      <div className="flex items-baseline justify-between mb-3">
+        <h2 className="text-xl font-bold">今日の感想を一言で</h2>
+        <span
+          className={`tabular-nums font-black text-lg ${remaining <= 10 ? 'text-rose-300' : 'text-white/80'}`}
+        >
+          残り {remaining}s
+        </span>
+      </div>
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value.slice(0, 80))}
         placeholder="例：自分のタイプが意外だった"
         rows={3}
-        className="w-full rounded-lg bg-bg-700 border border-white/10 px-3 py-2 mb-3"
+        disabled={expired}
+        className="w-full rounded-lg bg-bg-700 border border-white/10 px-3 py-2 mb-3 disabled:opacity-50"
       />
       <div className="flex justify-between text-xs text-white/50 mb-3">
         <span>最大80文字</span>
         <span>{text.length}/80</span>
       </div>
-      <button onClick={submit} disabled={!text.trim()} className="btn-primary w-full">
-        送信
+      <button
+        onClick={submit}
+        disabled={!text.trim() || expired}
+        className="btn-primary w-full"
+      >
+        {expired ? '時間切れ' : '送信'}
       </button>
     </div>
   );

@@ -6,6 +6,7 @@ import type {
 import {
   addCharacterPress,
   closeRoom,
+  computeCommentList,
   computeCrossMatrix,
   computeDistribution,
   computeProgress,
@@ -230,10 +231,14 @@ export class RoomDO {
         const raw = msg.payload?.text;
         const text = typeof raw === 'string' ? raw.trim().slice(0, 80) : '';
         if (text.length === 0) return;
-        this.room.comments.push(text);
+        this.room.comments.push({ text, ts: Date.now() });
         this.broadcastTeachers({
           type: 'COMMENT_CLOUD',
           payload: computeWordCloud(this.room.comments),
+        });
+        this.broadcastTeachers({
+          type: 'COMMENT_LIST',
+          payload: computeCommentList(this.room.comments),
         });
         return;
       }
@@ -369,6 +374,10 @@ export class RoomDO {
       this.broadcastTeachers({
         type: 'COMMENT_CLOUD',
         payload: computeWordCloud(this.room.comments),
+      });
+      this.broadcastTeachers({
+        type: 'COMMENT_LIST',
+        payload: computeCommentList(this.room.comments),
       });
     }
     void prev;

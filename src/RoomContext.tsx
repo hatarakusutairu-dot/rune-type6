@@ -33,6 +33,7 @@ interface ServerEvents {
   distribution?: Extract<ServerMessage, { type: 'WORK_DISTRIBUTION' }>['payload'];
   cross?: Extract<ServerMessage, { type: 'CROSS_MATRIX' }>['payload'];
   cloud?: Extract<ServerMessage, { type: 'COMMENT_CLOUD' }>['payload'];
+  commentList?: Extract<ServerMessage, { type: 'COMMENT_LIST' }>['payload'];
   lastReaction?: { emoji: string; seq: number };
   /** Last press event — used to trigger a burst animation. */
   lastCharacterPress?: { phase: string; count: number; seq: number };
@@ -119,6 +120,9 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
         break;
       case 'COMMENT_CLOUD':
         setEvents((e) => ({ ...e, cloud: msg.payload }));
+        break;
+      case 'COMMENT_LIST':
+        setEvents((e) => ({ ...e, commentList: msg.payload }));
         break;
       case 'REACTION_BURST':
         setEvents((e) => ({

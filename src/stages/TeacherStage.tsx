@@ -3,7 +3,8 @@ import { useRoom } from '../RoomContext';
 import { JoinQR } from '../routes/Teacher';
 import Distribution from '../components/Distribution';
 import CrossMatrix from '../components/CrossMatrix';
-import WordCloud from '../components/WordCloud';
+import CommentList from '../components/CommentList';
+import Countdown from '../components/Countdown';
 import TypeSlide from '../components/TypeSlide';
 import ClassLobby from '../components/ClassLobby';
 import CharacterPressCounter from '../components/CharacterPressCounter';
@@ -38,7 +39,7 @@ const PHASE_LABELS: Record<string, string> = {
   stage3_summary: 'クロス集計',
   stage3_share: '共有タイム',
   stage3_comment: '感想入力',
-  stage3_wordcloud: 'ワードクラウド',
+  stage3_wordcloud: 'みんなの感想',
   stage3_closing: 'まとめ',
   closed: 'アンケート',
 };
@@ -378,28 +379,32 @@ function PhaseBody() {
   }
 
   if (phase === 'stage3_comment') {
+    const submitted = room.events.commentList?.items.length ?? 0;
     return (
-      <SlideImage
-        phase="stage3_comment"
-        fallback={
-          <Slide title="今日の感想を一言で">
-            <p className="text-white/70">
-              スマホから感想を送ってください。次の画面でみんなの感想が表示されます。
-            </p>
-            <p className="mt-6 text-white/50 text-sm">
-              入室者 {room.studentCount} 名 / 感想 {room.events.cloud?.words.length ?? 0} 件
-            </p>
-          </Slide>
-        }
-      />
+      <section className="panel text-center">
+        <h2 className="text-3xl font-black mb-4">今日の感想を一言で</h2>
+        <p className="text-white/80 mb-6">
+          スマホから感想を送ってください。次の画面でみんなの感想が表示されます。
+        </p>
+        <div className="text-7xl mb-6">
+          <Countdown seconds={90} />
+        </div>
+        <p className="text-white/60 text-sm">
+          入室者 {room.studentCount} 名 / 送信済み {submitted} 件
+        </p>
+      </section>
     );
   }
 
   if (phase === 'stage3_wordcloud') {
+    const items = room.events.commentList?.items ?? [];
     return (
       <section className="panel">
-        <h3 className="text-xl font-bold mb-4">みんなの感想</h3>
-        <WordCloud words={room.events.cloud?.words ?? []} />
+        <div className="flex items-baseline justify-between mb-4">
+          <h3 className="text-2xl font-black">みんなの感想</h3>
+          <p className="text-white/60 text-sm">{items.length} 件 / {room.studentCount} 名</p>
+        </div>
+        <CommentList items={items} />
       </section>
     );
   }

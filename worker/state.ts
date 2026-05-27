@@ -13,7 +13,7 @@ export interface InternalRoomState {
   phase: Phase;
   distributionView: 'all' | string;
   students: Map<string, StudentInfo>;
-  comments: string[];
+  comments: { text: string; ts: number }[];
   /** explain-phase id -> set of sids that pressed "わたしや！". */
   characterPresses: Map<string, Set<string>>;
   createdAt: number;
@@ -145,10 +145,10 @@ const STOPWORDS = new Set([
   'する', 'これ', 'それ', 'あれ', 'です', 'ます', 'こと', 'よう', '思う', 'なる',
 ]);
 
-export function computeWordCloud(comments: string[]) {
+export function computeWordCloud(comments: { text: string; ts: number }[]) {
   const freq = new Map<string, number>();
   for (const c of comments) {
-    const words = c
+    const words = c.text
       .replace(/[、。．，,.!?！？\n\r\t]/g, ' ')
       .split(/\s+/)
       .map((w) => w.trim())
@@ -162,6 +162,10 @@ export function computeWordCloud(comments: string[]) {
     .sort((a, b) => b.count - a.count)
     .slice(0, 80);
   return { words };
+}
+
+export function computeCommentList(comments: { text: string; ts: number }[]) {
+  return { items: comments.map((c) => ({ text: c.text, ts: c.ts })) };
 }
 
 /**
