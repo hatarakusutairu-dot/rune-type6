@@ -168,6 +168,12 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
       handleRef.current?.close();
       setCode(c);
       setLastError(null);
+      // Reset per-room view state so a switch to a different room doesn't
+      // briefly show the old room's phase / self / events while the new
+      // STATE/JOINED arrives.
+      setState(null);
+      setSelf(null);
+      setEvents({});
       handleRef.current = connect({
         code: c,
         onMessage: handleMessage,

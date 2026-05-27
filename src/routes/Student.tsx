@@ -16,12 +16,24 @@ export default function Student() {
     room.setRole('student');
   }, [room]);
 
-  // If we have a code in the URL, connect immediately so we can fetch classes/state.
+  // Keep the local `code` state in sync with the URL so that visiting a new
+  // room URL in the same tab (e.g. after the teacher started a fresh
+  // session) actually picks up the new code instead of staying on the old
+  // one that was captured by the initial useState.
   useEffect(() => {
-    if (code && /^[0-9]{6}$/.test(code) && room.status === 'idle') {
+    if (queryRoom && /^[0-9]{6}$/.test(queryRoom) && queryRoom !== code) {
+      setCode(queryRoom);
+    }
+  }, [queryRoom, code]);
+
+  // Connect whenever the code becomes valid or changes. connectToRoom closes
+  // the existing socket first, so it's safe to call on every code change.
+  useEffect(() => {
+    if (code && /^[0-9]{6}$/.test(code)) {
       room.connectToRoom(code);
     }
-  }, [code, room]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [code]);
 
   const classes = useMemo(() => room.state?.classes ?? [], [room.state]);
 
@@ -68,6 +80,14 @@ export default function Student() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [classes, code, room.status, room.self, room.state, joined]);
+
+  // Reset the join flag whenever the room code changes so a tab that's
+  // already been "joined" to one room doesn't bypass the join form when the
+  // user navigates to a different room (e.g. after the teacher closed the
+  // previous session and started a new one).
+  useEffect(() => {
+    setJoined(false);
+  }, [code]);
 
   // Mirror server's `self` into local `joined` so a reconnect that gets a
   // fresh JOINED payload also flips us out of the form.
