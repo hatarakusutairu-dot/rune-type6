@@ -14,6 +14,8 @@ export interface InternalRoomState {
   distributionView: 'all' | string;
   students: Map<string, StudentInfo>;
   comments: { text: string; ts: number }[];
+  /** sids that have submitted at least one comment (for per-class progress). */
+  commentedSids: Set<string>;
   /** explain-phase id -> set of sids that pressed "わたしや！". */
   characterPresses: Map<string, Set<string>>;
   createdAt: number;
@@ -27,6 +29,7 @@ export interface SerializedRoomState {
   distributionView: 'all' | string;
   students: [string, StudentInfo][];
   comments: { text: string; ts: number }[];
+  commentedSids: string[];
   characterPresses: [string, string[]][];
   createdAt: number;
   teacherToken: string;
@@ -40,6 +43,7 @@ export function serializeRoom(s: InternalRoomState): SerializedRoomState {
     distributionView: s.distributionView,
     students: Array.from(s.students.entries()),
     comments: s.comments,
+    commentedSids: Array.from(s.commentedSids),
     characterPresses: Array.from(s.characterPresses.entries()).map(([k, v]) => [k, Array.from(v)]),
     createdAt: s.createdAt,
     teacherToken: s.teacherToken,
@@ -54,6 +58,7 @@ export function deserializeRoom(d: SerializedRoomState): InternalRoomState {
     distributionView: d.distributionView,
     students: new Map(d.students),
     comments: d.comments ?? [],
+    commentedSids: new Set(d.commentedSids ?? []),
     characterPresses: new Map(d.characterPresses.map(([k, v]) => [k, new Set(v)])),
     createdAt: d.createdAt,
     teacherToken: d.teacherToken,
@@ -68,6 +73,7 @@ export function createInternalRoomState(code: string, classes: string[] | null):
     distributionView: 'all',
     students: new Map(),
     comments: [],
+    commentedSids: new Set(),
     characterPresses: new Map(),
     createdAt: Date.now(),
     teacherToken: crypto.randomUUID(),
@@ -206,6 +212,23 @@ export function computeWordCloud(comments: { text: string; ts: number }[]) {
 
 export function computeCommentList(comments: { text: string; ts: number }[]) {
   return { items: comments.map((c) => ({ text: c.text, ts: c.ts })) };
+}
+
+export function computeCommentProgress(s: InternalRoomState) {
+  const perClass: Record<string, { count: number; total: number }> = {};
+  for (const c of s.classes) perClass[c] = { count: 0, total: 0 };
+  let count = 0;
+  let total = 0;
+  for (const st of s.students.values()) {
+    const bucket = perClass[st.className] ?? (perClass[st.className] = { count: 0, total: 0 });
+    bucket.total += 1;
+    total += 1;
+    if (s.commentedSids.has(st.sid)) {
+      bucket.count += 1;
+      count += 1;
+    }
+  }
+  return { count, total, perClass };
 }
 
 /**

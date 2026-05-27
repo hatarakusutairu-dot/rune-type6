@@ -139,6 +139,14 @@ export type ServerMessage =
   | { type: 'CROSS_MATRIX'; payload: { matrix: Record<string, Record<string, number>>; balanced: number } }
   | { type: 'COMMENT_CLOUD'; payload: { words: { text: string; count: number }[] } }
   | { type: 'COMMENT_LIST'; payload: { items: { text: string; ts: number }[] } }
+  | {
+      type: 'COMMENT_PROGRESS';
+      payload: {
+        count: number;
+        total: number;
+        perClass: Record<string, { count: number; total: number }>;
+      };
+    }
   | { type: 'STUDENT_COUNT'; payload: { count: number; perClass: Record<string, number> } }
   | { type: 'REACTION_BURST'; payload: { emoji: string; seq: number } }
   | {

@@ -7,6 +7,7 @@ import {
   addCharacterPress,
   closeRoom,
   computeCommentList,
+  computeCommentProgress,
   computeCrossMatrix,
   computeDistribution,
   computeProgress,
@@ -254,6 +255,7 @@ export class RoomDO {
         const text = typeof raw === 'string' ? raw.trim().slice(0, 80) : '';
         if (text.length === 0) return;
         this.room.comments.push({ text, ts: Date.now() });
+        if (attachment.sid) this.room.commentedSids.add(attachment.sid);
         await this.persist();
         this.broadcastTeachers({
           type: 'COMMENT_CLOUD',
@@ -262,6 +264,10 @@ export class RoomDO {
         this.broadcastTeachers({
           type: 'COMMENT_LIST',
           payload: computeCommentList(this.room.comments),
+        });
+        this.broadcastTeachers({
+          type: 'COMMENT_PROGRESS',
+          payload: computeCommentProgress(this.room),
         });
         return;
       }
@@ -395,6 +401,11 @@ export class RoomDO {
         type: 'CROSS_MATRIX',
         payload: computeCrossMatrix(this.room),
       });
+    } else if (phase === 'stage3_comment') {
+      this.broadcastTeachers({
+        type: 'COMMENT_PROGRESS',
+        payload: computeCommentProgress(this.room),
+      });
     } else if (phase === 'stage3_wordcloud') {
       this.broadcastTeachers({
         type: 'COMMENT_CLOUD',
@@ -403,6 +414,10 @@ export class RoomDO {
       this.broadcastTeachers({
         type: 'COMMENT_LIST',
         payload: computeCommentList(this.room.comments),
+      });
+      this.broadcastTeachers({
+        type: 'COMMENT_PROGRESS',
+        payload: computeCommentProgress(this.room),
       });
     }
     void prev;

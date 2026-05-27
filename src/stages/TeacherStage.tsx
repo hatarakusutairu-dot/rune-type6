@@ -379,7 +379,6 @@ function PhaseBody() {
   }
 
   if (phase === 'stage3_comment') {
-    const submitted = room.events.commentList?.items.length ?? 0;
     return (
       <div className="space-y-6">
         <SlideImage
@@ -392,13 +391,13 @@ function PhaseBody() {
             </Slide>
           }
         />
-        <section className="panel text-center">
-          <div className="text-6xl mb-3">
-            <Countdown seconds={90} />
+        <section className="panel">
+          <div className="text-center mb-6">
+            <div className="text-6xl mb-2">
+              <Countdown seconds={90} />
+            </div>
           </div>
-          <p className="text-white/60 text-sm">
-            入室者 {room.studentCount} 名 / 送信済み {submitted} 件
-          </p>
+          <CommentProgressBars />
         </section>
       </div>
     );
@@ -495,6 +494,69 @@ function ProgressView({ workId }: { workId: 1 | 2 }) {
         </p>
       )}
     </section>
+  );
+}
+
+function CommentProgressBars() {
+  const room = useRoom();
+  const progress = room.events.commentProgress;
+  const classes = room.state?.classes ?? [];
+  const overallCount = progress?.count ?? 0;
+  const overallTotal = progress?.total ?? room.studentCount;
+  const overallPct = overallTotal ? Math.round((overallCount / overallTotal) * 100) : 0;
+  const rankedClasses = classes
+    .map((c) => {
+      const row = progress?.perClass[c] ?? { count: 0, total: room.perClassCount[c] ?? 0 };
+      const pct = row.total ? Math.round((row.count / row.total) * 100) : 0;
+      return { name: c, count: row.count, total: row.total, pct };
+    })
+    .sort((a, b) => b.pct - a.pct || b.count - a.count);
+  return (
+    <div className="space-y-4">
+      <div>
+        <div className="flex justify-between text-sm text-white/80 mb-1">
+          <span className="font-bold">全体</span>
+          <span>
+            {overallCount}/{overallTotal}（{overallPct}%）
+          </span>
+        </div>
+        <div className="h-4 bg-white/10 rounded">
+          <div
+            className="h-4 bg-gradient-to-r from-fuchsia-500 to-cyan-400 rounded transition-[width] duration-500"
+            style={{ width: `${overallPct}%` }}
+          />
+        </div>
+      </div>
+      <div className="space-y-2 pt-2">
+        {rankedClasses.map((row, i) => {
+          const rank = row.total > 0 ? i + 1 : null;
+          const isTop = rank === 1 && row.count > 0;
+          return (
+            <div key={row.name}>
+              <div className="flex justify-between text-sm text-white/70 mb-1">
+                <span className={isTop ? 'font-bold text-amber-300' : ''}>
+                  {rank ? `${rank}位` : '-'} {row.name}
+                  {isTop ? ' 👑' : ''}
+                </span>
+                <span>
+                  {row.count}/{row.total}（{row.pct}%）
+                </span>
+              </div>
+              <div className="h-3 bg-white/10 rounded">
+                <div
+                  className={`h-3 rounded transition-[width] duration-500 ${
+                    isTop
+                      ? 'bg-gradient-to-r from-amber-400 to-rose-400'
+                      : 'bg-gradient-to-r from-fuchsia-500 to-cyan-400'
+                  }`}
+                  style={{ width: `${row.pct}%` }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
