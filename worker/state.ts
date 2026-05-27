@@ -14,6 +14,8 @@ export interface InternalRoomState {
   distributionView: 'all' | string;
   students: Map<string, StudentInfo>;
   comments: string[];
+  /** explain-phase id -> set of sids that pressed "わたしや！". */
+  characterPresses: Map<string, Set<string>>;
   createdAt: number;
   teacherToken: string;
 }
@@ -26,6 +28,7 @@ export function createInternalRoomState(code: string, classes: string[] | null):
     distributionView: 'all',
     students: new Map(),
     comments: [],
+    characterPresses: new Map(),
     createdAt: Date.now(),
     teacherToken: crypto.randomUUID(),
   };
@@ -40,6 +43,10 @@ export function toPublicState(s: InternalRoomState): PublicRoomState {
   }
   let count = 0;
   for (const v of Object.values(perClassCount)) count += v;
+  const characterPressCounts: Record<string, number> = {};
+  for (const [phase, set] of s.characterPresses) {
+    characterPressCounts[phase] = set.size;
+  }
   return {
     code: s.code,
     classes: s.classes,
@@ -47,6 +54,7 @@ export function toPublicState(s: InternalRoomState): PublicRoomState {
     distributionView: s.distributionView,
     studentCount: count,
     perClassCount,
+    characterPressCounts,
     createdAt: s.createdAt,
   };
 }
@@ -154,6 +162,26 @@ export function computeWordCloud(comments: string[]) {
     .sort((a, b) => b.count - a.count)
     .slice(0, 80);
   return { words };
+}
+
+/**
+ * Record a "I'm this character" press for the given phase. Returns the new
+ * count if the sid was newly added, or null if the sid had already pressed
+ * (idempotent).
+ */
+export function addCharacterPress(
+  s: InternalRoomState,
+  phase: string,
+  sid: string,
+): number | null {
+  let set = s.characterPresses.get(phase);
+  if (!set) {
+    set = new Set();
+    s.characterPresses.set(phase, set);
+  }
+  if (set.has(sid)) return null;
+  set.add(sid);
+  return set.size;
 }
 
 export function setWorkResult(

@@ -34,6 +34,8 @@ interface ServerEvents {
   cross?: Extract<ServerMessage, { type: 'CROSS_MATRIX' }>['payload'];
   cloud?: Extract<ServerMessage, { type: 'COMMENT_CLOUD' }>['payload'];
   lastReaction?: { emoji: string; seq: number };
+  /** Last press event — used to trigger a burst animation. */
+  lastCharacterPress?: { phase: string; count: number; seq: number };
 }
 
 interface RejoinInfo {
@@ -122,6 +124,27 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
         setEvents((e) => ({
           ...e,
           lastReaction: { emoji: msg.payload.emoji, seq: msg.payload.seq },
+        }));
+        break;
+      case 'CHARACTER_PRESS':
+        setState((s) =>
+          s
+            ? {
+                ...s,
+                characterPressCounts: {
+                  ...(s.characterPressCounts ?? {}),
+                  [msg.payload.phase]: msg.payload.count,
+                },
+              }
+            : s,
+        );
+        setEvents((e) => ({
+          ...e,
+          lastCharacterPress: {
+            phase: msg.payload.phase,
+            count: msg.payload.count,
+            seq: msg.payload.seq,
+          },
         }));
         break;
       case 'ERROR':

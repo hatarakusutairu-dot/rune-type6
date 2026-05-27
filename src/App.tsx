@@ -3,6 +3,7 @@ import { RoomProvider } from './RoomContext';
 import Landing from './routes/Landing';
 import Teacher from './routes/Teacher';
 import Student from './routes/Student';
+import CharacterCheckButton from './components/CharacterCheckButton';
 import ReactionBar from './components/ReactionBar';
 import ReactionBurst from './components/ReactionBurst';
 
@@ -18,6 +19,7 @@ export default function App() {
         </Routes>
         <ReactionBurst />
         <ReactionBar />
+        <CharacterCheckButton />
       </BrowserRouter>
     </RoomProvider>
   );

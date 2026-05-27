@@ -75,6 +75,8 @@ export interface PublicRoomState {
   distributionView: 'all' | string;
   studentCount: number;
   perClassCount: Record<string, number>;
+  /** Per-phase "I'm this character" press counts (for the explain phases). */
+  characterPressCounts: Record<string, number>;
   createdAt: number;
 }
 
@@ -99,7 +101,8 @@ export type StudentMessage =
         subType: string;
       };
     }
-  | { type: 'S_COMMENT'; payload: { text: string } };
+  | { type: 'S_COMMENT'; payload: { text: string } }
+  | { type: 'S_CHARACTER_CHECK'; payload: { phase: Phase } };
 
 export type CommonMessage =
   | { type: 'REACTION'; payload: { emoji: string } }
@@ -137,6 +140,10 @@ export type ServerMessage =
   | { type: 'COMMENT_CLOUD'; payload: { words: { text: string; count: number }[] } }
   | { type: 'STUDENT_COUNT'; payload: { count: number; perClass: Record<string, number> } }
   | { type: 'REACTION_BURST'; payload: { emoji: string; seq: number } }
+  | {
+      type: 'CHARACTER_PRESS';
+      payload: { phase: Phase; count: number; seq: number };
+    }
   | { type: 'ERROR'; payload: { code: string; message: string } }
   | { type: 'PONG'; payload: {} };
 

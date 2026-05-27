@@ -6,6 +6,7 @@ import CrossMatrix from '../components/CrossMatrix';
 import WordCloud from '../components/WordCloud';
 import TypeSlide from '../components/TypeSlide';
 import ClassLobby from '../components/ClassLobby';
+import CharacterPressCounter from '../components/CharacterPressCounter';
 import SlideImage from '../components/SlideImage';
 import SurveyQR from '../components/SurveyQR';
 import { WORK1_ORDER, WORK2_ORDER } from '../lib/scoring';
@@ -313,12 +314,22 @@ function PhaseBody() {
 
   if (phase.startsWith('stage1_explain')) {
     const t = EXPLAIN_TYPE_W1[phase];
-    return <SlideImage phase={phase} fallback={<TypeSlide typeId={t} />} />;
+    return (
+      <>
+        <SlideImage phase={phase} fallback={<TypeSlide typeId={t} />} />
+        <CharacterPressCounter />
+      </>
+    );
   }
 
   if (phase.startsWith('stage2_explain')) {
     const t = EXPLAIN_TYPE_W2[phase];
-    return <SlideImage phase={phase} fallback={<TypeSlide typeId={t} />} />;
+    return (
+      <>
+        <SlideImage phase={phase} fallback={<TypeSlide typeId={t} />} />
+        <CharacterPressCounter />
+      </>
+    );
   }
 
   if (phase === 'stage1_bridge') {

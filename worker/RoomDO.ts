@@ -4,6 +4,7 @@ import type {
   StudentInfo,
 } from '../shared/protocol';
 import {
+  addCharacterPress,
   closeRoom,
   computeCrossMatrix,
   computeDistribution,
@@ -28,6 +29,7 @@ export class RoomDO {
   private state: DurableObjectState;
   private room: InternalRoomState | null = null;
   private reactionSeq = 0;
+  private characterSeq = 0;
 
   constructor(state: DurableObjectState) {
     this.state = state;
@@ -232,6 +234,27 @@ export class RoomDO {
         this.broadcastTeachers({
           type: 'COMMENT_CLOUD',
           payload: computeWordCloud(this.room.comments),
+        });
+        return;
+      }
+
+      case 'S_CHARACTER_CHECK': {
+        const sid = attachment.sid;
+        if (!sid || !this.room.students.has(sid)) {
+          this.sendTo(ws, {
+            type: 'ERROR',
+            payload: { code: 'NO_SID', message: '入室していません' },
+          });
+          return;
+        }
+        const phase = msg.payload?.phase;
+        if (typeof phase !== 'string' || !phase.includes('_explain_')) return;
+        const size = addCharacterPress(this.room, phase, sid);
+        if (size === null) return;
+        this.characterSeq += 1;
+        this.broadcast({
+          type: 'CHARACTER_PRESS',
+          payload: { phase: phase as never, count: size, seq: this.characterSeq },
         });
         return;
       }
