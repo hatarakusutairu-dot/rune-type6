@@ -137,35 +137,40 @@ export default function StudentStage() {
 
   if (phase === 'stage0_work1title') {
     return (
-      <SlidePage
-        phase="stage0_work1title"
-        fallback={
-          <WorkIntroSlide
+      <main key={phase} className="min-h-screen p-4 sm:p-6 animate-[fadein_400ms_ease-out]">
+        <div className="max-w-xl mx-auto space-y-4">
+          <SlideImage phase="stage0_work1title" fallback={null} />
+          <WorkIntroPanel
             badge="WORK 1"
             title="ゲーマータイプ診断"
             description="あなたが普段ゲームをやるときの『楽しみ方の傾向』を4タイプに分けて見える化します。勝つこと？上達？仲間との時間？新しい発見？——20問の質問に直感で答えてください。"
-            bullets={[
-              '20問・直感でOK',
-              '一度選ぶと戻れません',
-              '正解はありません',
-            ]}
+            bullets={['20問・直感でOK', '一度選ぶと戻れません', '正解はありません']}
           />
-        }
-      />
+        </div>
+      </main>
     );
   }
 
   if (phase === 'stage0_work1') {
     return (
-      <SlidePage
-        phase="stage0_work1"
-        fallback={
-          <TextSlide
-            title="WORK 1 ─ ルール"
-            body="これから20問。直感で選んでね。一度選ぶと次の問題に進みます。"
-          />
-        }
-      />
+      <main key={phase} className="min-h-screen p-4 sm:p-6 animate-[fadein_400ms_ease-out]">
+        <div className="max-w-xl mx-auto space-y-4">
+          <SlideImage phase="stage0_work1" fallback={null} />
+          <section className="panel">
+            <p className="text-white/40 text-xs mb-2 text-center tracking-widest">
+              WORK 1 ─ 進め方
+            </p>
+            <p className="text-white/85 text-sm leading-relaxed mb-3">
+              スマホ／PCで20問に回答してください。直感で選んでOK。正解はありません。
+            </p>
+            <ul className="text-white/70 text-sm space-y-1">
+              <li>・1問ずつ進みます（1つ選ぶと次へ）</li>
+              <li>・一度選んだ答えは戻せません</li>
+              <li>・全員の回答が揃ったら結果に進みます</li>
+            </ul>
+          </section>
+        </div>
+      </main>
     );
   }
 
@@ -246,35 +251,42 @@ export default function StudentStage() {
 
   if (phase === 'stage2_work2title') {
     return (
-      <SlidePage
-        phase="stage2_work2title"
-        fallback={
-          <WorkIntroSlide
+      <main key={phase} className="min-h-screen p-4 sm:p-6 animate-[fadein_400ms_ease-out]">
+        <div className="max-w-xl mx-auto space-y-4">
+          <SlideImage phase="stage2_work2title" fallback={null} />
+          <WorkIntroPanel
             badge="WORK 2"
             title="危機対応タイプ診断"
             description="チームでピンチになったとき、自分はどう動くタイプかを診断します。『攻める／守る／分析する／励ます』——4つの危機対応パターンから自分の傾向を見える化。チーム経験がなくても「もしそうなったら？」の想像でOK。"
-            bullets={[
-              '想像で答えてOK',
-              '20問・直感で',
-              '間違いはありません',
-            ]}
+            bullets={['想像で答えてOK', '20問・直感で', '間違いはありません']}
           />
-        }
-      />
+        </div>
+      </main>
     );
   }
 
   if (phase === 'stage2_work2') {
     return (
-      <SlidePage
-        phase="stage2_work2"
-        fallback={
-          <TextSlide
-            title="WORK 2 ─ ルール"
-            body="ここからはチームでのピンチ場面を想像して答えてください。チーム経験がなくても大丈夫。直感でOK。"
-          />
-        }
-      />
+      <main key={phase} className="min-h-screen p-4 sm:p-6 animate-[fadein_400ms_ease-out]">
+        <div className="max-w-xl mx-auto space-y-4">
+          <SlideImage phase="stage2_work2" fallback={null} />
+          <section className="panel">
+            <p className="text-white/40 text-xs mb-2 text-center tracking-widest">
+              WORK 2 ─ 進め方
+            </p>
+            <p className="text-white/85 text-sm leading-relaxed mb-3">
+              ここからは <span className="font-bold">チームでピンチになった場面</span>{' '}
+              を想像して答えてください。チーム経験がなくても大丈夫。
+              「もしそうなったら自分はどうするかな？」と想像で選んでOK。
+            </p>
+            <ul className="text-white/70 text-sm space-y-1">
+              <li>・想像で答えてOK</li>
+              <li>・20問・直感で選ぶ</li>
+              <li>・間違いはありません</li>
+            </ul>
+          </section>
+        </div>
+      </main>
     );
   }
 
@@ -555,7 +567,7 @@ function TextSlide({ title, body }: { title: string; body: string }) {
   );
 }
 
-function WorkIntroSlide({
+function WorkIntroPanel({
   badge,
   title,
   description,
@@ -567,7 +579,7 @@ function WorkIntroSlide({
   bullets?: string[];
 }) {
   return (
-    <Center>
+    <section className="panel text-center">
       <p className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-fuchsia-500/40 to-cyan-400/40 text-white text-xs font-black tracking-widest mb-3">
         {badge}
       </p>
@@ -584,7 +596,7 @@ function WorkIntroSlide({
           ))}
         </ul>
       )}
-    </Center>
+    </section>
   );
 }
 
