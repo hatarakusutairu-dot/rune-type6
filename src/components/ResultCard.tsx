@@ -1,6 +1,7 @@
 import RadarChart from './RadarChart';
-import { typeInfo } from '../data/typeInfo';
-import { WORK1_ORDER, WORK2_ORDER } from '../lib/scoring';
+import { WORK1_ORDER, WORK2_ORDER } from '../lib/scoreUtils';
+import { generateWork1Analysis, generateWork2Analysis } from '../lib/scoring';
+import type { Work1Scores, Work2Scores } from '../types/analysis';
 
 interface Props {
   workId: 1 | 2;
@@ -40,18 +41,10 @@ export default function ResultCard({ workId, scores, mainType, subType, tieWith 
 
   const headline = isBalanced ? 'バランス型' : labels[mainType] ?? mainType;
   const color = isBalanced ? '#A0E7FF' : COLORS[mainType] ?? '#fff';
-  const main = isBalanced ? null : typeInfo[mainType];
-  const sub = typeInfo[subType];
 
-  const hasDetail =
-    !!main &&
-    ((main.motivators && main.motivators.length > 0) ||
-      (main.demotivators && main.demotivators.length > 0) ||
-      (main.goodSigns && main.goodSigns.length > 0) ||
-      (main.badSigns && main.badSigns.length > 0) ||
-      !!main.helpfulActions ||
-      !!main.teamValue ||
-      !!main.overdone);
+  const analysis = workId === 1
+    ? generateWork1Analysis(scores as unknown as Work1Scores)
+    : generateWork2Analysis(scores as unknown as Work2Scores);
 
   return (
     <article className="panel" style={{ borderColor: `${color}55` }}>
@@ -60,9 +53,11 @@ export default function ResultCard({ workId, scores, mainType, subType, tieWith 
         <h2 className="text-4xl font-black" style={{ color }}>
           {headline}
         </h2>
-        {main?.catchcopy && <p className="text-white/80 mt-1">{main.catchcopy}</p>}
-        {main?.description && (
-          <p className="text-white/70 text-sm mt-2 leading-relaxed">{main.description}</p>
+        <p className="text-white/90 mt-2 text-lg font-bold">{analysis.catchcopy}</p>
+        {analysis.summary && (
+          <p className="text-white/80 text-sm mt-3 leading-relaxed whitespace-pre-line">
+            {analysis.summary}
+          </p>
         )}
         {tieWith && (
           <p className="text-white/60 text-sm mt-2">
@@ -75,46 +70,33 @@ export default function ResultCard({ workId, scores, mainType, subType, tieWith 
         <RadarChart scores={scores} order={order} colors={COLORS} labels={labels} />
       </div>
 
-      {!isBalanced && sub && (
+      {!isBalanced && (
         <p className="text-white/80 text-sm mb-3">
-          サブ傾向：<span className="font-bold">{labels[subType]}</span>{' '}
+          サブ傾向：<span className="font-bold">{labels[subType] ?? subType}</span>{' '}
           の要素も強めです。
         </p>
       )}
 
-      <p className="text-white/60 text-xs mb-4">
+      <p className="text-white/60 text-xs mb-5">
         ※ 今日の回答での傾向です。固定的な性格分類ではありません。
       </p>
 
-      {!isBalanced && main && hasDetail && (
-        <div className="mt-2 space-y-4 text-sm">
-          <DetailSection emoji="💬" title="燃える言葉" items={main.motivators} />
-          <DetailSection emoji="🚫" title="やる気なくす言葉" items={main.demotivators} />
-          <DetailSection emoji="⚡" title="調子いい時のサイン" items={main.goodSigns} />
-          <DetailSection emoji="📉" title="調子悪い時のサイン" items={main.badSigns} />
-          {main.helpfulActions && (
-            <DetailPara emoji="🤝" title="こうしてもらえると助かる" body={main.helpfulActions} />
-          )}
-          {main.teamValue && (
-            <DetailPara emoji="🎮" title="チームでの価値" body={main.teamValue} />
-          )}
-          {main.overdone && (
-            <DetailPara emoji="⚠️" title="過剰になると" body={main.overdone} />
-          )}
-        </div>
+      {analysis.detail && (
+        <DetailPara emoji="🔍" title="詳細分析" body={analysis.detail} />
       )}
 
-      {isBalanced && (
-        <div className="mt-2 text-sm text-white/80 space-y-2">
-          <p>
-            4タイプすべてのスコアが近い、バランス型の傾向です。
-            状況や相手に合わせて柔軟に役割を変えられるのが強みです。
-          </p>
-          <p className="text-white/60">
-            ※ 今日の回答のスコアが拮抗していたため、特定のタイプを断定していません。
-          </p>
-        </div>
-      )}
+      <div className="mt-4 space-y-4 text-sm">
+        <DetailSection emoji="💬" title="燃える言葉" items={analysis.motivators} />
+        <DetailSection emoji="🚫" title="やる気なくす言葉" items={analysis.demotivators} />
+        <DetailSection emoji="⚡" title="調子いい時のサイン" items={analysis.goodSigns} />
+        <DetailSection emoji="📉" title="調子悪い時のサイン" items={analysis.badSigns} />
+        {analysis.helpfulActions && (
+          <DetailPara emoji="🤝" title="こうしてもらえると助かる" body={analysis.helpfulActions} />
+        )}
+        {analysis.growthTip && (
+          <DetailPara emoji="🌱" title="伸びしろ" body={analysis.growthTip} />
+        )}
+      </div>
     </article>
   );
 }
@@ -142,7 +124,7 @@ function DetailPara({ emoji, title, body }: { emoji: string; title: string; body
       <h4 className="font-bold mb-1">
         {emoji} {title}
       </h4>
-      <p className="text-white/80">{body}</p>
+      <p className="text-white/80 whitespace-pre-line leading-relaxed">{body}</p>
     </div>
   );
 }

@@ -7,7 +7,7 @@ import {
   WORK1_ORDER,
   WORK2_ORDER,
   type Question,
-} from '../lib/scoring';
+} from '../lib/scoreUtils';
 import { loadState, patchWork } from '../lib/storage';
 
 interface Props {

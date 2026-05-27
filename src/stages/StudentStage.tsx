@@ -7,7 +7,8 @@ import SurveyQR from '../components/SurveyQR';
 import { useCountdown } from '../components/Countdown';
 import { work1Questions } from '../data/work1Questions';
 import { work2Questions } from '../data/work2Questions';
-import { getCombo } from '../data/comboAnalysis';
+import { generateTotalAnalysis } from '../lib/scoring';
+import type { Work1Scores, Work2Scores } from '../types/analysis';
 import { loadState } from '../lib/storage';
 
 /** Renders /slides/<phase>.png if it exists, falling back to the given node. */
@@ -327,7 +328,12 @@ function CombinedResult() {
   const persisted = loadState();
   const w1 = persisted.work1;
   const w2 = persisted.work2;
-  const combo = w1?.mainType && w2?.mainType ? getCombo(w1.mainType, w2.mainType) : null;
+  const total = w1?.scores && w2?.scores
+    ? generateTotalAnalysis(
+        w1.scores as unknown as Work1Scores,
+        w2.scores as unknown as Work2Scores,
+      )
+    : null;
 
   return (
     <div className="space-y-4">
@@ -336,23 +342,31 @@ function CombinedResult() {
         <h2 className="text-2xl font-black">総合結果</h2>
       </header>
 
-      {combo && (
+      {total && (
         <article className="panel">
           <p className="text-white/50 text-xs">あなたのタイプ</p>
           <h3 className="text-3xl font-black bg-gradient-to-r from-fuchsia-400 to-cyan-300 bg-clip-text text-transparent">
-            {combo.catchcopy}
+            {total.catchcopy}
           </h3>
-          <p className="text-white/80 text-sm mt-2 leading-relaxed">{combo.description}</p>
+          <p className="text-white/80 text-sm mt-3 leading-relaxed whitespace-pre-line">
+            {total.summary}
+          </p>
           <div className="mt-4 space-y-3 text-sm">
-            <Detail emoji="💬" title="燃える言葉" items={combo.motivators} />
-            <Detail emoji="🚫" title="やる気なくす言葉" items={combo.demotivators} />
-            <Detail emoji="⚡" title="調子いいサイン" items={combo.goodSigns} />
-            <Detail emoji="📉" title="調子悪いサイン" items={combo.badSigns} />
-            {combo.helpfulActions && (
-              <DetailPara emoji="🤝" title="助かるフォロー" body={combo.helpfulActions} />
+            {total.detail && (
+              <DetailPara emoji="🔍" title="詳細分析" body={total.detail} />
             )}
-            {combo.teamRole && (
-              <DetailPara emoji="🎮" title="チームでの活かし方" body={combo.teamRole} />
+            <Detail emoji="💬" title="燃える言葉" items={total.motivators} />
+            <Detail emoji="🚫" title="やる気なくす言葉" items={total.demotivators} />
+            <Detail emoji="⚡" title="調子いいサイン" items={total.goodSigns} />
+            <Detail emoji="📉" title="調子悪いサイン" items={total.badSigns} />
+            {total.helpfulActions && (
+              <DetailPara emoji="🤝" title="助かるフォロー" body={total.helpfulActions} />
+            )}
+            {total.teamRole && (
+              <DetailPara emoji="🎮" title="チームでの活かし方" body={total.teamRole} />
+            )}
+            {total.growthTip && (
+              <DetailPara emoji="🌱" title="伸びしろ" body={total.growthTip} />
             )}
           </div>
         </article>
@@ -409,7 +423,7 @@ function DetailPara({ emoji, title, body }: { emoji: string; title: string; body
       <h4 className="font-bold mb-1">
         {emoji} {title}
       </h4>
-      <p className="text-white/85">{body}</p>
+      <p className="text-white/85 whitespace-pre-line leading-relaxed">{body}</p>
     </div>
   );
 }

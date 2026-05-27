@@ -1,4 +1,4 @@
-import { WORK1_ORDER, WORK2_ORDER } from '../lib/scoring';
+import { WORK1_ORDER, WORK2_ORDER } from '../lib/scoreUtils';
 
 const LABELS_W1: Record<string, string> = {
   competitor: 'コンペティター',

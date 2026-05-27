@@ -1,4 +1,4 @@
-import type { Question } from '../lib/scoring';
+import type { Question } from '../lib/scoreUtils';
 
 export const work1Questions: Question[] = [
   {

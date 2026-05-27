@@ -10,7 +10,7 @@ import ClassLobby from '../components/ClassLobby';
 import CharacterPressCounter from '../components/CharacterPressCounter';
 import SlideImage from '../components/SlideImage';
 import SurveyQR from '../components/SurveyQR';
-import { WORK1_ORDER, WORK2_ORDER } from '../lib/scoring';
+import { WORK1_ORDER, WORK2_ORDER } from '../lib/scoreUtils';
 
 const PHASE_LABELS: Record<string, string> = {
   lobby: 'ロビー',
