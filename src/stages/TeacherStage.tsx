@@ -381,18 +381,26 @@ function PhaseBody() {
   if (phase === 'stage3_comment') {
     const submitted = room.events.commentList?.items.length ?? 0;
     return (
-      <section className="panel text-center">
-        <h2 className="text-3xl font-black mb-4">今日の感想を一言で</h2>
-        <p className="text-white/80 mb-6">
-          スマホから感想を送ってください。次の画面でみんなの感想が表示されます。
-        </p>
-        <div className="text-7xl mb-6">
-          <Countdown seconds={90} />
-        </div>
-        <p className="text-white/60 text-sm">
-          入室者 {room.studentCount} 名 / 送信済み {submitted} 件
-        </p>
-      </section>
+      <div className="space-y-6">
+        <SlideImage
+          phase="stage3_comment"
+          fallback={
+            <Slide title="今日の感想を一言で">
+              <p className="text-white/80">
+                スマホから感想を送ってください。次の画面でみんなの感想が表示されます。
+              </p>
+            </Slide>
+          }
+        />
+        <section className="panel text-center">
+          <div className="text-6xl mb-3">
+            <Countdown seconds={90} />
+          </div>
+          <p className="text-white/60 text-sm">
+            入室者 {room.studentCount} 名 / 送信済み {submitted} 件
+          </p>
+        </section>
+      </div>
     );
   }
 
