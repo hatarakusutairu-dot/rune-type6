@@ -20,6 +20,46 @@ export interface InternalRoomState {
   teacherToken: string;
 }
 
+export interface SerializedRoomState {
+  code: string;
+  classes: string[];
+  phase: Phase;
+  distributionView: 'all' | string;
+  students: [string, StudentInfo][];
+  comments: { text: string; ts: number }[];
+  characterPresses: [string, string[]][];
+  createdAt: number;
+  teacherToken: string;
+}
+
+export function serializeRoom(s: InternalRoomState): SerializedRoomState {
+  return {
+    code: s.code,
+    classes: s.classes,
+    phase: s.phase,
+    distributionView: s.distributionView,
+    students: Array.from(s.students.entries()),
+    comments: s.comments,
+    characterPresses: Array.from(s.characterPresses.entries()).map(([k, v]) => [k, Array.from(v)]),
+    createdAt: s.createdAt,
+    teacherToken: s.teacherToken,
+  };
+}
+
+export function deserializeRoom(d: SerializedRoomState): InternalRoomState {
+  return {
+    code: d.code,
+    classes: d.classes,
+    phase: d.phase,
+    distributionView: d.distributionView,
+    students: new Map(d.students),
+    comments: d.comments ?? [],
+    characterPresses: new Map(d.characterPresses.map(([k, v]) => [k, new Set(v)])),
+    createdAt: d.createdAt,
+    teacherToken: d.teacherToken,
+  };
+}
+
 export function createInternalRoomState(code: string, classes: string[] | null): InternalRoomState {
   return {
     code,

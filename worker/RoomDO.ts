@@ -12,13 +12,18 @@ import {
   computeProgress,
   computeWordCloud,
   createInternalRoomState,
+  deserializeRoom,
   endActive,
   advancePhase,
   rewindPhase,
+  serializeRoom,
   setWorkResult,
   toPublicState,
   type InternalRoomState,
+  type SerializedRoomState,
 } from './state';
+
+const STORAGE_KEY = 'room';
 
 interface Attachment {
   role: 'teacher' | 'student' | 'pending';
@@ -34,6 +39,15 @@ export class RoomDO {
 
   constructor(state: DurableObjectState) {
     this.state = state;
+    state.blockConcurrencyWhile(async () => {
+      const saved = await state.storage.get<SerializedRoomState>(STORAGE_KEY);
+      if (saved) this.room = deserializeRoom(saved);
+    });
+  }
+
+  private async persist() {
+    if (!this.room) return;
+    await this.state.storage.put(STORAGE_KEY, serializeRoom(this.room));
   }
 
   async fetch(req: Request): Promise<Response> {
@@ -43,6 +57,7 @@ export class RoomDO {
       const body = (await req.json()) as { code: string; classes: string[] | null };
       if (!this.room) {
         this.room = createInternalRoomState(body.code, body.classes);
+        await this.persist();
       }
       return new Response(JSON.stringify({ teacherToken: this.room.teacherToken }), {
         headers: { 'content-type': 'application/json' },
@@ -123,6 +138,7 @@ export class RoomDO {
         attachment.role = 'student';
         attachment.sid = student.sid;
         ws.serializeAttachment(attachment);
+        await this.persist();
         this.sendTo(ws, {
           type: 'JOINED',
           payload: { sid: student.sid, state: toPublicState(this.room), self: student },
@@ -153,6 +169,7 @@ export class RoomDO {
         if (!this.checkTeacher(ws, msg.payload.token)) return;
         const prev = this.room.phase;
         const phase = advancePhase(this.room);
+        await this.persist();
         this.broadcast({ type: 'PHASE_CHANGE', payload: { phase } });
         this.onPhaseEntered(prev, phase);
         return;
@@ -163,6 +180,7 @@ export class RoomDO {
         const prev = this.room.phase;
         const phase = rewindPhase(this.room);
         if (phase !== prev) {
+          await this.persist();
           this.broadcast({ type: 'PHASE_CHANGE', payload: { phase } });
           this.onPhaseEntered(prev, phase);
         }
@@ -174,6 +192,7 @@ export class RoomDO {
         const prev = this.room.phase;
         const phase = endActive(this.room);
         if (phase !== prev) {
+          await this.persist();
           this.broadcast({ type: 'PHASE_CHANGE', payload: { phase } });
           this.onPhaseEntered(prev, phase);
         }
@@ -183,6 +202,7 @@ export class RoomDO {
       case 'T_CLOSE_ROOM': {
         if (!this.checkTeacher(ws, msg.payload.token)) return;
         const phase = closeRoom(this.room);
+        await this.persist();
         this.broadcast({ type: 'PHASE_CHANGE', payload: { phase } });
         return;
       }
@@ -190,6 +210,7 @@ export class RoomDO {
       case 'T_SET_DISTRIBUTION_VIEW': {
         if (!this.checkTeacher(ws, msg.payload.token)) return;
         this.room.distributionView = msg.payload.view;
+        await this.persist();
         this.broadcast({ type: 'STATE', payload: { state: toPublicState(this.room) } });
         return;
       }
@@ -219,6 +240,7 @@ export class RoomDO {
           return;
         }
         setWorkResult(this.room, sid, workId, scores, mainType, subType);
+        await this.persist();
         // Live progress to teacher(s) during active phase.
         this.broadcastTeachers({
           type: 'PROGRESS',
@@ -232,6 +254,7 @@ export class RoomDO {
         const text = typeof raw === 'string' ? raw.trim().slice(0, 80) : '';
         if (text.length === 0) return;
         this.room.comments.push({ text, ts: Date.now() });
+        await this.persist();
         this.broadcastTeachers({
           type: 'COMMENT_CLOUD',
           payload: computeWordCloud(this.room.comments),
@@ -256,6 +279,7 @@ export class RoomDO {
         if (typeof phase !== 'string' || !phase.includes('_explain_')) return;
         const size = addCharacterPress(this.room, phase, sid);
         if (size === null) return;
+        await this.persist();
         this.characterSeq += 1;
         this.broadcast({
           type: 'CHARACTER_PRESS',
@@ -287,6 +311,7 @@ export class RoomDO {
         st.online = false;
         st.lastSeenAt = Date.now();
       }
+      await this.persist();
       this.broadcastStudentCount();
     }
   }
