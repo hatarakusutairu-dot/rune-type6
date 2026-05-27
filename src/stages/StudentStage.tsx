@@ -49,29 +49,32 @@ export default function StudentStage() {
 
   if (phase === 'stage0_rules') {
     return (
-      <SlidePage
-        phase="stage0_rules"
-        fallback={
-          <Center>
-            <p className="text-white/40 text-xs mb-3">RULES</p>
-            <h2 className="text-2xl font-black mb-4">きょうのルール</h2>
-            <ol className="space-y-3 text-left text-sm">
-              <li className="flex gap-2">
-                <span className="text-cyan-400 font-black">①</span>
-                <span>診断結果に良い悪いはない。全部チームに必要なタイプ</span>
+      <main key={phase} className="min-h-screen p-4 sm:p-6 animate-[fadein_400ms_ease-out]">
+        <div className="max-w-xl mx-auto space-y-4">
+          <SlideImage phase="stage0_rules" fallback={null} />
+          <section className="panel">
+            <p className="text-white/40 text-xs mb-3 text-center tracking-widest">
+              RULES — きょうのルール
+            </p>
+            <ol className="space-y-3 text-sm">
+              <li className="flex gap-3">
+                <span className="text-cyan-400 font-black text-lg leading-none">①</span>
+                <span className="text-white/90">
+                  診断結果に良い悪いはない。全部チームに必要なタイプ
+                </span>
               </li>
-              <li className="flex gap-2">
-                <span className="text-cyan-400 font-black">②</span>
-                <span>否定しない・笑わない</span>
+              <li className="flex gap-3">
+                <span className="text-cyan-400 font-black text-lg leading-none">②</span>
+                <span className="text-white/90">否定しない・笑わない</span>
               </li>
-              <li className="flex gap-2">
-                <span className="text-cyan-400 font-black">③</span>
-                <span>ここだけの話</span>
+              <li className="flex gap-3">
+                <span className="text-cyan-400 font-black text-lg leading-none">③</span>
+                <span className="text-white/90">ここだけの話</span>
               </li>
             </ol>
-          </Center>
-        }
-      />
+          </section>
+        </div>
+      </main>
     );
   }
 
@@ -94,26 +97,41 @@ export default function StudentStage() {
 
   if (phase === 'stage0_flow') {
     return (
-      <SlidePage
-        phase="stage0_flow"
-        fallback={
-          <Center>
-            <p className="text-white/40 text-xs mb-3">FLOW</p>
-            <h2 className="text-2xl font-black mb-4">きょうの流れ</h2>
-            <ul className="space-y-2 text-left text-sm">
-              <li>
-                <span className="text-pink-400 font-black">WORK 1</span> ─ ゲーマータイプ診断
+      <main key={phase} className="min-h-screen p-4 sm:p-6 animate-[fadein_400ms_ease-out]">
+        <div className="max-w-xl mx-auto space-y-4">
+          <SlideImage phase="stage0_flow" fallback={null} />
+          <section className="panel">
+            <p className="text-white/40 text-xs mb-3 text-center tracking-widest">
+              TODAY'S FLOW — きょうの流れ
+            </p>
+            <ul className="space-y-3 text-sm">
+              <li className="flex items-start gap-3">
+                <span className="text-pink-400 font-black w-16 shrink-0">WORK 1</span>
+                <div>
+                  <div className="font-bold text-white/90">ゲーマータイプ診断</div>
+                  <div className="text-white/60 text-xs">自分の楽しみ方を知る</div>
+                </div>
               </li>
-              <li>
-                <span className="text-cyan-400 font-black">WORK 2</span> ─ 危機対応タイプ診断
+              <li className="flex items-start gap-3">
+                <span className="text-fuchsia-400 font-black w-16 shrink-0">WORK 2</span>
+                <div>
+                  <div className="font-bold text-white/90">危機対応タイプ診断</div>
+                  <div className="text-white/60 text-xs">ピンチの自分を知る</div>
+                </div>
               </li>
-              <li>
-                <span className="text-yellow-300 font-black">TOTAL</span> ─ 総合分析
+              <li className="flex items-start gap-3">
+                <span className="text-yellow-300 font-black w-16 shrink-0">TOTAL</span>
+                <div>
+                  <div className="font-bold text-white/90">総合分析</div>
+                  <div className="text-white/60 text-xs">
+                    2つを掛け合わせた、あなただけの結果
+                  </div>
+                </div>
               </li>
             </ul>
-          </Center>
-        }
-      />
+          </section>
+        </div>
+      </main>
     );
   }
 
