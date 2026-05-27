@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { useRoom } from '../RoomContext';
 import { JoinQR } from '../routes/Teacher';
 import Distribution from '../components/Distribution';
@@ -197,7 +196,14 @@ function PhaseBody() {
     return (
       <SlideImage
         phase="stage0_work1title"
-        fallback={<Slide title="WORK 1"><p className="text-3xl font-black">WORK 1</p></Slide>}
+        fallback={
+          <WorkIntroSlide
+            badge="WORK 1"
+            title="ゲーマータイプ診断"
+            description="普段ゲームをやるときの『楽しみ方の傾向』を4タイプに分けて見える化します。勝つこと？上達？仲間？新しい発見？——20問の質問に直感で答えてもらいます。"
+            bullets={['20問・直感でOK', '一度選ぶと戻れません', '正解はありません']}
+          />
+        }
       />
     );
   }
@@ -219,7 +225,14 @@ function PhaseBody() {
     return (
       <SlideImage
         phase="stage2_work2title"
-        fallback={<Slide title="WORK 2"><p className="text-3xl font-black">WORK 2</p></Slide>}
+        fallback={
+          <WorkIntroSlide
+            badge="WORK 2"
+            title="危機対応タイプ診断"
+            description="チームでピンチになったときに自分はどう動くタイプかを診断します。『攻める／守る／分析する／励ます』——4つの危機対応パターンから自分の傾向を見える化。"
+            bullets={['想像で答えてOK', '20問・直感で', '間違いはありません']}
+          />
+        }
       />
     );
   }
@@ -338,13 +351,30 @@ function PhaseBody() {
       <SlideImage
         phase="stage1_bridge"
         fallback={
-          <Slide title="ワーク2へ">
-            <p className="text-white/85 leading-relaxed">
-              ワーク1では『普段のゲームとの向き合い方』を見ました。
-              次のワーク2では『チームでピンチの時にどう動くか』を見ていきます。
-              2つを掛け合わせることで、生徒それぞれのプレイヤータイプが見えてきます。
+          <section className="panel text-center bg-gradient-to-br from-fuchsia-500/10 via-violet-500/5 to-cyan-400/10 border-fuchsia-300/30">
+            <p className="text-white/50 text-xs tracking-[0.4em] mb-2">BRIDGE</p>
+            <h2 className="text-6xl font-black mb-6 bg-gradient-to-r from-fuchsia-400 via-rose-300 to-cyan-300 bg-clip-text text-transparent drop-shadow-[0_0_24px_rgba(255,64,129,0.3)]">
+              次は WORK 2
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-4 max-w-3xl mx-auto mb-6">
+              <div className="panel bg-white/5 border-white/10">
+                <p className="text-white/50 text-xs mb-1">WORK 1</p>
+                <p className="text-lg font-bold">普段の向き合い方</p>
+              </div>
+              <div className="text-4xl font-black text-white/60">×</div>
+              <div className="panel bg-white/5 border-white/10">
+                <p className="text-white/50 text-xs mb-1">WORK 2</p>
+                <p className="text-lg font-bold">ピンチでの動き</p>
+              </div>
+            </div>
+            <p className="text-white/80 text-lg leading-relaxed max-w-2xl mx-auto">
+              2つを掛け合わせると、<br />
+              <span className="font-black text-white">
+                生徒それぞれのプレイヤータイプ
+              </span>
+              が見えてくる。
             </p>
-          </Slide>
+          </section>
         }
       />
     );
@@ -447,6 +477,44 @@ function Slide({ title, children }: { title: string; children: React.ReactNode }
     <section className="panel min-h-[40vh]">
       <p className="text-white/40 text-xs mb-3">{title}</p>
       <div className="text-white/90">{children}</div>
+    </section>
+  );
+}
+
+function WorkIntroSlide({
+  badge,
+  title,
+  description,
+  bullets,
+}: {
+  badge: string;
+  title: string;
+  description: string;
+  bullets?: string[];
+}) {
+  return (
+    <section className="panel text-center">
+      <p className="inline-block px-4 py-1.5 rounded-full bg-gradient-to-r from-fuchsia-500/40 to-cyan-400/40 text-white text-sm font-black tracking-widest mb-4">
+        {badge}
+      </p>
+      <h2 className="text-5xl font-black mb-6 bg-gradient-to-r from-fuchsia-400 to-cyan-300 bg-clip-text text-transparent">
+        {title}
+      </h2>
+      <p className="text-white/85 text-lg leading-relaxed max-w-2xl mx-auto mb-6 whitespace-pre-line">
+        {description}
+      </p>
+      {bullets && bullets.length > 0 && (
+        <ul className="inline-flex flex-wrap gap-3 justify-center text-white/70 text-sm">
+          {bullets.map((b, i) => (
+            <li
+              key={i}
+              className="px-3 py-1 rounded-full bg-white/5 border border-white/10"
+            >
+              ・{b}
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   );
 }
@@ -562,74 +630,64 @@ function CommentProgressBars() {
 
 function DistributionView({ workId }: { workId: 1 | 2 }) {
   const room = useRoom();
-  const token = room.teacherToken;
   const dist = room.events.distribution;
   const data = dist && dist.workId === workId ? dist : null;
   const order = workId === 1 ? WORK1_ORDER : WORK2_ORDER;
   const labels = workId === 1 ? LABELS_W1 : LABELS_W2;
+  const classes = room.state?.classes ?? [];
 
-  const [view, setView] = useState<'all' | string>(room.state?.distributionView ?? 'all');
-
-  useEffect(() => {
-    if (room.state?.distributionView) setView(room.state.distributionView);
-  }, [room.state?.distributionView]);
-
-  function changeView(v: 'all' | string) {
-    setView(v);
-    if (!token) return;
-    room.send({ type: 'T_SET_DISTRIBUTION_VIEW', payload: { token, view: v } });
+  function orderFor(d: Record<string, number>) {
+    return (d.balanced ?? 0) > 0 ? [...order, 'balanced'] : [...order];
   }
 
-  const shown =
-    view === 'all'
-      ? data?.overall ?? {}
-      : data?.perClass[view] ?? {};
-
   return (
-    <section className="panel">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-bold">タイプ分布（ワーク{workId}）</h3>
-      </div>
-      <div className="flex flex-wrap gap-2 mb-4">
-        <ViewTab v="all" current={view} onClick={changeView} label="全体" />
-        {(room.state?.classes ?? []).map((c) => (
-          <ViewTab key={c} v={c} current={view} onClick={changeView} label={c} />
-        ))}
-      </div>
-      {data ? (
-        <Distribution
-          data={shown}
-          order={(shown.balanced ?? 0) > 0 ? [...order, 'balanced'] : [...order]}
-          labels={labels}
-          colors={COLORS}
-        />
-      ) : (
-        <p className="text-white/60 text-sm">集計中…</p>
+    <div className="space-y-4">
+      <section className="panel">
+        <div className="flex items-baseline justify-between mb-4">
+          <h3 className="text-2xl font-black">タイプ分布（ワーク{workId}）— 全体</h3>
+          {data && (
+            <span className="text-white/60 text-sm">
+              {Object.values(data.overall).reduce((a, b) => a + b, 0)} 名
+            </span>
+          )}
+        </div>
+        {data ? (
+          <Distribution
+            data={data.overall}
+            order={orderFor(data.overall)}
+            labels={labels}
+            colors={COLORS}
+          />
+        ) : (
+          <p className="text-white/60 text-sm">集計中…</p>
+        )}
+      </section>
+
+      {data && classes.length > 0 && (
+        <section className="panel">
+          <h3 className="text-lg font-bold mb-4 text-white/80">クラス別</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
+            {classes.map((c) => {
+              const d = data.perClass[c] ?? {};
+              const total = Object.values(d).reduce((a, b) => a + b, 0);
+              return (
+                <div key={c}>
+                  <div className="flex items-baseline justify-between mb-2">
+                    <h4 className="font-bold text-base">{c}</h4>
+                    <span className="text-white/50 text-xs">{total} 名</span>
+                  </div>
+                  {total > 0 ? (
+                    <Distribution data={d} order={orderFor(d)} labels={labels} colors={COLORS} />
+                  ) : (
+                    <p className="text-white/40 text-sm">回答なし</p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
       )}
-    </section>
+    </div>
   );
 }
 
-function ViewTab({
-  v,
-  current,
-  onClick,
-  label,
-}: {
-  v: 'all' | string;
-  current: string;
-  onClick: (v: 'all' | string) => void;
-  label: string;
-}) {
-  const active = current === v;
-  return (
-    <button
-      onClick={() => onClick(v)}
-      className={`rounded-lg px-3 py-1 text-sm border ${
-        active ? 'border-cyan-400 bg-cyan-400/10' : 'border-white/15 bg-white/5'
-      }`}
-    >
-      {label}
-    </button>
-  );
-}

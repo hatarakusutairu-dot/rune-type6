@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useRoom } from '../RoomContext';
-import { ensureRoom, loadState } from '../lib/storage';
+import { ensureRoom, loadState, patchState } from '../lib/storage';
 import StudentStage from '../stages/StudentStage';
 
 export default function Student() {
@@ -32,17 +32,48 @@ export default function Student() {
     }
   }, [classes, className]);
 
-  function handleJoin() {
-    if (!code || !className) return;
+  function handleJoin(targetClass?: string) {
+    const cls = targetClass ?? className;
+    if (!code || !cls) return;
     // If the student is joining a *different* room than last time, wipe out
     // stale work1/work2/comment so they don't see fake results.
     const fresh = ensureRoom(code);
+    if (cls !== className) setClassName(cls);
+    patchState({ className: cls });
     room.send({
       type: 'S_JOIN',
-      payload: { code, className, sid: fresh.sid },
+      payload: { code, className: cls, sid: fresh.sid },
     });
     setJoined(true);
   }
+
+  // Auto-rejoin after reload / phone-resume: if we already know the room code
+  // and the class from a previous session, jump straight back to StudentStage
+  // without forcing the user through the join form again.
+  useEffect(() => {
+    if (joined) return;
+    if (room.self && room.state) {
+      setJoined(true);
+      return;
+    }
+    const stored = loadState();
+    if (
+      stored.roomCode === code &&
+      stored.className &&
+      classes.length > 0 &&
+      classes.includes(stored.className) &&
+      room.status === 'open'
+    ) {
+      handleJoin(stored.className);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [classes, code, room.status, room.self, room.state, joined]);
+
+  // Mirror server's `self` into local `joined` so a reconnect that gets a
+  // fresh JOINED payload also flips us out of the form.
+  useEffect(() => {
+    if (room.self && room.state) setJoined(true);
+  }, [room.self, room.state]);
 
   const statusLabel: Record<typeof room.status, string> = {
     idle: 'コードを入力してね',
@@ -92,7 +123,7 @@ export default function Student() {
             </p>
           )}
           <button
-            onClick={handleJoin}
+            onClick={() => handleJoin()}
             disabled={!code || !className || room.status !== 'open' || classes.length === 0}
             className="btn-primary w-full"
           >

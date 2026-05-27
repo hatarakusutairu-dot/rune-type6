@@ -9,6 +9,7 @@ import {
   type Question,
 } from '../lib/scoreUtils';
 import { loadState, patchWork } from '../lib/storage';
+import ResultCard from './ResultCard';
 
 interface Props {
   workId: 1 | 2;
@@ -88,6 +89,25 @@ export default function Quiz({ workId, questions }: Props) {
   }
 
   if (submitted) {
+    const w = workId === 1 ? loadState().work1 : loadState().work2;
+    if (w?.scores && w?.mainType) {
+      return (
+        <div className="space-y-3">
+          <div className="panel text-center py-3">
+            <p className="text-white/90 font-bold">送信完了！</p>
+            <p className="text-white/60 text-xs mt-1">
+              講師の合図まで、先に自分の結果を読んでおこう
+            </p>
+          </div>
+          <ResultCard
+            workId={workId}
+            scores={w.scores}
+            mainType={w.mainType}
+            subType={w.subType ?? ''}
+          />
+        </div>
+      );
+    }
     return (
       <div className="panel max-w-md w-full mx-auto text-center">
         <h2 className="text-2xl font-bold mb-2">回答ありがとう！</h2>

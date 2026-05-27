@@ -121,7 +121,18 @@ export default function StudentStage() {
     return (
       <SlidePage
         phase="stage0_work1title"
-        fallback={<TextSlide title="WORK 1" body="ゲーマータイプ診断" />}
+        fallback={
+          <WorkIntroSlide
+            badge="WORK 1"
+            title="ゲーマータイプ診断"
+            description="あなたが普段ゲームをやるときの『楽しみ方の傾向』を4タイプに分けて見える化します。勝つこと？上達？仲間との時間？新しい発見？——20問の質問に直感で答えてください。"
+            bullets={[
+              '20問・直感でOK',
+              '一度選ぶと戻れません',
+              '正解はありません',
+            ]}
+          />
+        }
       />
     );
   }
@@ -183,13 +194,33 @@ export default function StudentStage() {
       <SlidePage
         phase="stage1_bridge"
         fallback={
-          <Center>
-            <h2 className="text-xl font-bold mb-3">次はワーク2</h2>
-            <p className="text-white/80 leading-relaxed text-sm">
-              ワーク1では『普段のゲームとの向き合い方』を見ました。
-              次のワーク2では『チームでピンチの時にどう動くか』を見ていきます。
-            </p>
-          </Center>
+          <main key={phase} className="min-h-screen flex items-center justify-center p-6">
+            <div
+              key={phase}
+              className="panel max-w-md w-full text-center animate-[fadein_400ms_ease-out] bg-gradient-to-br from-fuchsia-500/10 via-violet-500/5 to-cyan-400/10 border-fuchsia-300/30"
+            >
+              <p className="text-white/50 text-xs tracking-[0.4em] mb-2">BRIDGE</p>
+              <h2 className="text-4xl font-black mb-5 bg-gradient-to-r from-fuchsia-400 via-rose-300 to-cyan-300 bg-clip-text text-transparent">
+                次は WORK 2
+              </h2>
+              <div className="grid grid-cols-3 items-center gap-2 mb-5">
+                <div className="rounded-xl bg-white/5 border border-white/10 p-3">
+                  <p className="text-white/50 text-[10px] mb-1">WORK 1</p>
+                  <p className="text-xs font-bold leading-tight">普段の<br />向き合い方</p>
+                </div>
+                <div className="text-2xl font-black text-white/60">×</div>
+                <div className="rounded-xl bg-white/5 border border-white/10 p-3">
+                  <p className="text-white/50 text-[10px] mb-1">WORK 2</p>
+                  <p className="text-xs font-bold leading-tight">ピンチでの<br />動き</p>
+                </div>
+              </div>
+              <p className="text-white/80 text-sm leading-relaxed">
+                2つを掛け合わせると、<br />
+                <span className="font-black text-white">あなただけのプレイヤータイプ</span>
+                が見えてくる。
+              </p>
+            </div>
+          </main>
         }
       />
     );
@@ -199,7 +230,18 @@ export default function StudentStage() {
     return (
       <SlidePage
         phase="stage2_work2title"
-        fallback={<TextSlide title="WORK 2" body="危機対応タイプ診断" />}
+        fallback={
+          <WorkIntroSlide
+            badge="WORK 2"
+            title="危機対応タイプ診断"
+            description="チームでピンチになったとき、自分はどう動くタイプかを診断します。『攻める／守る／分析する／励ます』——4つの危機対応パターンから自分の傾向を見える化。チーム経験がなくても「もしそうなったら？」の想像でOK。"
+            bullets={[
+              '想像で答えてOK',
+              '20問・直感で',
+              '間違いはありません',
+            ]}
+          />
+        }
       />
     );
   }
@@ -491,6 +533,39 @@ function TextSlide({ title, body }: { title: string; body: string }) {
         {title}
       </h2>
       <p className="text-white/80 text-sm leading-relaxed">{body}</p>
+    </Center>
+  );
+}
+
+function WorkIntroSlide({
+  badge,
+  title,
+  description,
+  bullets,
+}: {
+  badge: string;
+  title: string;
+  description: string;
+  bullets?: string[];
+}) {
+  return (
+    <Center>
+      <p className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-fuchsia-500/40 to-cyan-400/40 text-white text-xs font-black tracking-widest mb-3">
+        {badge}
+      </p>
+      <h2 className="text-3xl font-black mb-4 bg-gradient-to-r from-fuchsia-400 to-cyan-300 bg-clip-text text-transparent">
+        {title}
+      </h2>
+      <p className="text-white/85 text-sm leading-relaxed text-left mb-4 whitespace-pre-line">
+        {description}
+      </p>
+      {bullets && bullets.length > 0 && (
+        <ul className="text-left text-white/70 text-sm space-y-1">
+          {bullets.map((b, i) => (
+            <li key={i}>・{b}</li>
+          ))}
+        </ul>
+      )}
     </Center>
   );
 }
