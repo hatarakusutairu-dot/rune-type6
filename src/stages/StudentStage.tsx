@@ -373,8 +373,9 @@ export default function StudentStage() {
   if (phase === 'closed') {
     return (
       <main key={phase} className="min-h-screen p-4 sm:p-6 animate-[fadein_400ms_ease-out]">
-        <div className="max-w-xl mx-auto">
+        <div className="max-w-xl mx-auto space-y-4">
           <SurveyQR />
+          <ClosedActions />
         </div>
       </main>
     );
@@ -497,6 +498,39 @@ function DetailPara({ emoji, title, body }: { emoji: string; title: string; body
       </h4>
       <p className="text-white/85 whitespace-pre-line leading-relaxed">{body}</p>
     </div>
+  );
+}
+
+function ClosedActions() {
+  const [code, setCode] = useState('');
+  function go() {
+    const c = code.trim();
+    if (!/^[0-9]{6}$/.test(c)) return;
+    // Full reload to guarantee a clean slate.
+    window.location.assign(`/student?room=${c}`);
+  }
+  return (
+    <section className="panel">
+      <p className="text-white/70 text-sm text-center mb-3">
+        別のルームに入る場合は、新しい6桁コードを入力してください
+      </p>
+      <div className="flex gap-2">
+        <input
+          value={code}
+          onChange={(e) => setCode(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
+          inputMode="numeric"
+          placeholder="新しいコード"
+          className="flex-1 rounded-lg bg-bg-700 border border-white/10 px-3 py-2 font-mono text-lg tracking-widest"
+        />
+        <button
+          onClick={go}
+          disabled={!/^[0-9]{6}$/.test(code)}
+          className="btn-primary disabled:opacity-40"
+        >
+          入る
+        </button>
+      </div>
+    </section>
   );
 }
 
