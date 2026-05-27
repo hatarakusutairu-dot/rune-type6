@@ -16,7 +16,7 @@ export default function RadarChart({
   size = 340,
 }: Props) {
   // Reserve space for outer labels so long Japanese names don't clip.
-  const labelPad = 56;
+  const labelPad = 92;
   const cx = size / 2;
   const cy = size / 2;
   const radius = size / 2 - labelPad;
