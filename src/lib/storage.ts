@@ -67,6 +67,16 @@ export function clearState() {
 }
 
 /**
+ * Clear the student's room-binding state (sid / roomCode / className /
+ * work data) so the next page load shows the join form instead of
+ * auto-rejoining a finished session. Called when the room enters phase
+ * 'closed'.
+ */
+export function clearRoomBinding() {
+  safeWrite({ ...DEFAULT_STATE });
+}
+
+/**
  * Discard any work / comment data when the student joins a different room than
  * the one stored locally. Keeps `sid` so the server still recognises the device.
  */

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useRoom } from '../RoomContext';
-import { ensureRoom, loadState, patchState } from '../lib/storage';
+import { clearRoomBinding, ensureRoom, loadState, patchState } from '../lib/storage';
 import StudentStage from '../stages/StudentStage';
 
 export default function Student() {
@@ -61,9 +61,12 @@ export default function Student() {
 
   // Auto-rejoin after reload / phone-resume: if we already know the room code
   // and the class from a previous session, jump straight back to StudentStage
-  // without forcing the user through the join form again.
+  // without forcing the user through the join form again. Skipped once the
+  // room has been closed so a finished session doesn't drag the student back
+  // in.
   useEffect(() => {
     if (joined) return;
+    if (room.state?.phase === 'closed') return;
     if (room.self && room.state) {
       setJoined(true);
       return;
@@ -80,6 +83,15 @@ export default function Student() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [classes, code, room.status, room.self, room.state, joined]);
+
+  // When the teacher ends the session, wipe the local room binding so a
+  // subsequent reload comes up on the empty join form instead of silently
+  // reconnecting to the now-closed room.
+  useEffect(() => {
+    if (room.state?.phase === 'closed') {
+      clearRoomBinding();
+    }
+  }, [room.state?.phase]);
 
   // Reset the join flag whenever the room code changes so a tab that's
   // already been "joined" to one room doesn't bypass the join form when the
