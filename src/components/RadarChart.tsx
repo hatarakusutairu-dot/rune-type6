@@ -15,8 +15,8 @@ export default function RadarChart({
   max = 20,
   size = 340,
 }: Props) {
-  // Reserve space for outer labels so long Japanese names don't clip.
-  const labelPad = 92;
+  // Slightly tighter padding now that long labels wrap onto two lines.
+  const labelPad = 72;
   const cx = size / 2;
   const cy = size / 2;
   const radius = size / 2 - labelPad;
@@ -58,6 +58,13 @@ export default function RadarChart({
     return dx > 0 ? 'start' : 'end';
   }
 
+  /** Break Japanese type labels longer than 5 chars into 2 roughly-even lines. */
+  function wrapLabel(text: string): string[] {
+    if (text.length <= 5) return [text];
+    const mid = Math.ceil(text.length / 2);
+    return [text.slice(0, mid), text.slice(mid)];
+  }
+
   return (
     <svg
       width="100%"
@@ -97,6 +104,8 @@ export default function RadarChart({
         const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
         const lx = cx + (radius + 14) * Math.cos(angle);
         const ly = cy + (radius + 14) * Math.sin(angle);
+        const lines = wrapLabel(labels[t] ?? t);
+        const firstDy = lines.length > 1 ? '-0.4em' : '0';
         return (
           <text
             key={t}
@@ -108,7 +117,11 @@ export default function RadarChart({
             fill={colors[t]}
             className="font-bold"
           >
-            {labels[t] ?? t}
+            {lines.map((line, idx) => (
+              <tspan key={idx} x={lx} dy={idx === 0 ? firstDy : '1.1em'}>
+                {line}
+              </tspan>
+            ))}
           </text>
         );
       })}
