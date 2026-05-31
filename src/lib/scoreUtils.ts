@@ -39,7 +39,11 @@ export function judgeType(scores: Record<string, number>, order: readonly string
   const values = Object.values(filled);
   const max = Math.max(...values);
   const min = Math.min(...values);
-  const isBalanced = max - min <= 2;
+  // Balanced: every type sits in the 3-7 range AND the top-bottom gap is at most 4.
+  // Matches the threshold used by analyzeScores in lib/scoring.ts so that a
+  // student labelled 'balanced' on the server gets a 'balanced' analysis card too.
+  const allInRange = values.every((v) => v >= 3 && v <= 7);
+  const isBalanced = allInRange && max - min <= 4;
 
   // Determine the order-younger top.
   let mainType = order[0];
