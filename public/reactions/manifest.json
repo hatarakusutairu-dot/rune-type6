@@ -1,9 +1,10 @@
 {
   "items": [
-    { "key": "gg",    "label": "GG" },
-    { "key": "nice",  "label": "ナイス" },
-    { "key": "kusa",  "label": "草" },
-    { "key": "wow",   "label": "すごい" },
-    { "key": "fight", "label": "ファイト" }
+    { "key": "gg",      "label": "GG" },
+    { "key": "nice",    "label": "ナイス" },
+    { "key": "kusa",    "label": "草" },
+    { "key": "wow",     "label": "すごい" },
+    { "key": "fight",   "label": "ファイト" },
+    { "key": "balance", "label": "バランス" }
   ]
 }
