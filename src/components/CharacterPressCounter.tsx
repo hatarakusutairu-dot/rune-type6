@@ -6,10 +6,12 @@ const EXPLAIN_INFO: Record<string, { name: string; color: string; emoji: string 
   stage1_explain_2: { name: 'アチーバー', color: '#FFD700', emoji: '🏆' },
   stage1_explain_3: { name: 'ソーシャライザー', color: '#00E676', emoji: '🤝' },
   stage1_explain_4: { name: 'エクスプローラー', color: '#448AFF', emoji: '🧭' },
+  stage1_explain_5: { name: 'バランス型', color: '#C0C0C0', emoji: '🎛️' },
   stage2_explain_1: { name: 'アタッカー', color: '#FF6D00', emoji: '🔥' },
   stage2_explain_2: { name: 'ガーディアン', color: '#00BCD4', emoji: '🛡️' },
   stage2_explain_3: { name: 'アナリスト', color: '#AA00FF', emoji: '🔍' },
   stage2_explain_4: { name: 'ブースター', color: '#FF4081', emoji: '✨' },
+  stage2_explain_5: { name: 'バランス型', color: '#C0C0C0', emoji: '🎛️' },
 };
 
 interface Burst {
