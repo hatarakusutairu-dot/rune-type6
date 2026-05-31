@@ -194,62 +194,69 @@ function PhaseBody() {
 
   if (phase === 'stage0_work1title') {
     return (
-      <SlideImage
-        phase="stage0_work1title"
-        fallback={
-          <WorkIntroSlide
-            badge="WORK 1"
-            title="ゲーマータイプ診断"
-            description="普段ゲームをやるときの『楽しみ方の傾向』を4タイプに分けて見える化します。勝つこと？上達？仲間？新しい発見？——20問の質問に直感で答えてもらいます。"
-            bullets={['20問・直感でOK', '一度選ぶと戻れません', '正解はありません']}
-          />
-        }
-      />
+      <div className="space-y-6">
+        <SlideImage phase="stage0_work1title" fallback={null} />
+        <WorkIntroSlide
+          badge="WORK 1"
+          title="ゲーマータイプ診断"
+          description="普段ゲームをやるときの『楽しみ方の傾向』を4タイプに分けて見える化します。勝つこと？上達？仲間？新しい発見？——20問の質問に直感で答えてもらいます。"
+          bullets={['20問・直感でOK', '一度選ぶと戻れません', '正解はありません']}
+        />
+      </div>
     );
   }
 
   if (phase === 'stage0_work1') {
     return (
-      <SlideImage
-        phase="stage0_work1"
-        fallback={
-          <Slide title="WORK 1 ─ 説明">
-            <p className="text-white/85">これから20問の質問に答えてください。直感で大丈夫。</p>
-          </Slide>
-        }
-      />
+      <div className="space-y-6">
+        <SlideImage phase="stage0_work1" fallback={null} />
+        <section className="panel">
+          <p className="text-white/40 text-sm mb-3 tracking-widest">WORK 1 ─ 進め方</p>
+          <p className="text-white/85 text-lg leading-relaxed mb-4">
+            スマホ／PCから20問の質問に答えてもらいます。直感で大丈夫、正解はありません。
+          </p>
+          <ul className="text-white/75 text-base space-y-2">
+            <li>・1問ずつ進行（選ぶと次へ）</li>
+            <li>・一度選んだ答えは戻せません</li>
+            <li>・全員揃ったら「締切」を押して結果フェーズへ</li>
+          </ul>
+        </section>
+      </div>
     );
   }
 
   if (phase === 'stage2_work2title') {
     return (
-      <SlideImage
-        phase="stage2_work2title"
-        fallback={
-          <WorkIntroSlide
-            badge="WORK 2"
-            title="危機対応タイプ診断"
-            description="チームでピンチになったときに自分はどう動くタイプかを診断します。『攻める／守る／分析する／励ます』——4つの危機対応パターンから自分の傾向を見える化。"
-            bullets={['想像で答えてOK', '20問・直感で', '間違いはありません']}
-          />
-        }
-      />
+      <div className="space-y-6">
+        <SlideImage phase="stage2_work2title" fallback={null} />
+        <WorkIntroSlide
+          badge="WORK 2"
+          title="危機対応タイプ診断"
+          description="チームでピンチになったときに自分はどう動くタイプかを診断します。『攻める／守る／分析する／励ます』——4つの危機対応パターンから自分の傾向を見える化。"
+          bullets={['想像で答えてOK', '20問・直感で', '間違いはありません']}
+        />
+      </div>
     );
   }
 
   if (phase === 'stage2_work2') {
     return (
-      <SlideImage
-        phase="stage2_work2"
-        fallback={
-          <Slide title="WORK 2 ─ 説明">
-            <p className="text-white/85">
-              ここからはチームでのピンチ場面を想像して答えてください。
-              チーム経験がなくても大丈夫。直感で選んでOK。
-            </p>
-          </Slide>
-        }
-      />
+      <div className="space-y-6">
+        <SlideImage phase="stage2_work2" fallback={null} />
+        <section className="panel">
+          <p className="text-white/40 text-sm mb-3 tracking-widest">WORK 2 ─ 進め方</p>
+          <p className="text-white/85 text-lg leading-relaxed mb-4">
+            ここからは <span className="font-bold">チームでピンチになった場面</span>{' '}
+            を想像して答えてもらいます。チーム経験がなくても大丈夫。
+            「もしそうなったら自分はどうするかな？」と想像で選んでOK。
+          </p>
+          <ul className="text-white/75 text-base space-y-2">
+            <li>・想像で答えてOK</li>
+            <li>・20問・直感で</li>
+            <li>・間違いはありません</li>
+          </ul>
+        </section>
+      </div>
     );
   }
 
@@ -269,18 +276,30 @@ function PhaseBody() {
 
   if (phase === 'stage0_rules') {
     return (
-      <SlideImage
-        phase="stage0_rules"
-        fallback={
-          <Slide title="ルール">
-            <ol className="space-y-3 text-2xl">
-              <li><span className="text-cyan-400 font-black">①</span> 診断結果に良い悪いはない。全部チームに必要なタイプ</li>
-              <li><span className="text-cyan-400 font-black">②</span> 否定しない・笑わない</li>
-              <li><span className="text-cyan-400 font-black">③</span> ここだけの話</li>
-            </ol>
-          </Slide>
-        }
-      />
+      <div className="space-y-6">
+        <SlideImage phase="stage0_rules" fallback={null} />
+        <section className="panel">
+          <p className="text-white/40 text-sm mb-4 tracking-widest text-center">
+            RULES ─ きょうのルール
+          </p>
+          <ol className="space-y-4 text-lg">
+            <li className="flex gap-3">
+              <span className="text-cyan-400 font-black text-2xl leading-none">①</span>
+              <span className="text-white/90">
+                診断結果に良い悪いはない。全部チームに必要なタイプ
+              </span>
+            </li>
+            <li className="flex gap-3">
+              <span className="text-cyan-400 font-black text-2xl leading-none">②</span>
+              <span className="text-white/90">否定しない・笑わない</span>
+            </li>
+            <li className="flex gap-3">
+              <span className="text-cyan-400 font-black text-2xl leading-none">③</span>
+              <span className="text-white/90">ここだけの話</span>
+            </li>
+          </ol>
+        </section>
+      </div>
     );
   }
 
@@ -303,18 +322,39 @@ function PhaseBody() {
 
   if (phase === 'stage0_flow') {
     return (
-      <SlideImage
-        phase="stage0_flow"
-        fallback={
-          <Slide title="今日の流れ">
-            <ul className="space-y-3 text-xl">
-              <li><span className="text-pink-400 font-black">WORK 1</span> ─ ゲーマータイプ診断（自分の楽しみ方を知る）</li>
-              <li><span className="text-cyan-400 font-black">WORK 2</span> ─ 危機対応タイプ診断（ピンチの自分を知る）</li>
-              <li><span className="text-yellow-300 font-black">TOTAL</span> ─ 総合分析（2つを掛け合わせた自分だけの結果）</li>
-            </ul>
-          </Slide>
-        }
-      />
+      <div className="space-y-6">
+        <SlideImage phase="stage0_flow" fallback={null} />
+        <section className="panel">
+          <p className="text-white/40 text-sm mb-4 tracking-widest text-center">
+            TODAY'S FLOW ─ きょうの流れ
+          </p>
+          <ul className="space-y-4 text-lg">
+            <li className="flex items-start gap-4">
+              <span className="text-pink-400 font-black w-20 shrink-0">WORK 1</span>
+              <div>
+                <div className="font-bold text-white/90">ゲーマータイプ診断</div>
+                <div className="text-white/60 text-sm">自分の楽しみ方を知る</div>
+              </div>
+            </li>
+            <li className="flex items-start gap-4">
+              <span className="text-fuchsia-400 font-black w-20 shrink-0">WORK 2</span>
+              <div>
+                <div className="font-bold text-white/90">危機対応タイプ診断</div>
+                <div className="text-white/60 text-sm">ピンチの自分を知る</div>
+              </div>
+            </li>
+            <li className="flex items-start gap-4">
+              <span className="text-yellow-300 font-black w-20 shrink-0">TOTAL</span>
+              <div>
+                <div className="font-bold text-white/90">総合分析</div>
+                <div className="text-white/60 text-sm">
+                  2つを掛け合わせた、生徒それぞれだけの結果
+                </div>
+              </div>
+            </li>
+          </ul>
+        </section>
+      </div>
     );
   }
 
