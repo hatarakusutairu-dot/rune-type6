@@ -1,28 +1,35 @@
 import { WORK1_ORDER, WORK2_ORDER } from '../lib/scoreUtils';
 
+const ROW_ORDER = [...WORK1_ORDER, 'balanced'];
+const COL_ORDER = [...WORK2_ORDER, 'balanced'];
+
 const LABELS_W1: Record<string, string> = {
   competitor: 'コンペティター',
   achiever: 'アチーバー',
   socializer: 'ソーシャライザー',
   explorer: 'エクスプローラー',
+  balanced: 'バランス型',
 };
 const LABELS_W2: Record<string, string> = {
   attacker: 'アタッカー',
   guardian: 'ガーディアン',
   analyst: 'アナリスト',
   booster: 'ブースター',
+  balanced: 'バランス型',
 };
 const COLORS_W1: Record<string, string> = {
   competitor: '#FF4444',
   achiever: '#FFD700',
   socializer: '#00E676',
   explorer: '#448AFF',
+  balanced: '#C0C0C0',
 };
 const COLORS_W2: Record<string, string> = {
   attacker: '#FF6D00',
   guardian: '#00BCD4',
   analyst: '#AA00FF',
   booster: '#FF4081',
+  balanced: '#C0C0C0',
 };
 
 interface Props {
@@ -33,7 +40,7 @@ interface Props {
 export default function CrossMatrix({ matrix, balanced }: Props) {
   const maxCell = Math.max(
     1,
-    ...WORK1_ORDER.flatMap((r) => WORK2_ORDER.map((c) => matrix[r]?.[c] ?? 0)),
+    ...ROW_ORDER.flatMap((r) => COL_ORDER.map((c) => matrix[r]?.[c] ?? 0)),
   );
 
   return (
@@ -42,7 +49,7 @@ export default function CrossMatrix({ matrix, balanced }: Props) {
         <thead>
           <tr>
             <th className="p-2 text-left text-white/40 text-xs">W1 ＼ W2</th>
-            {WORK2_ORDER.map((c) => (
+            {COL_ORDER.map((c) => (
               <th
                 key={c}
                 className="p-2 text-xs font-bold"
@@ -54,7 +61,7 @@ export default function CrossMatrix({ matrix, balanced }: Props) {
           </tr>
         </thead>
         <tbody>
-          {WORK1_ORDER.map((r) => (
+          {ROW_ORDER.map((r) => (
             <tr key={r}>
               <th
                 className="p-2 text-right text-xs font-bold"
@@ -62,7 +69,7 @@ export default function CrossMatrix({ matrix, balanced }: Props) {
               >
                 {LABELS_W1[r]}
               </th>
-              {WORK2_ORDER.map((c) => {
+              {COL_ORDER.map((c) => {
                 const v = matrix[r]?.[c] ?? 0;
                 const intensity = v / maxCell;
                 return (
@@ -82,8 +89,9 @@ export default function CrossMatrix({ matrix, balanced }: Props) {
         </tbody>
       </table>
       {balanced > 0 && (
-        <p className="mt-3 text-white/70 text-sm">
-          バランス型：<span className="font-bold">{balanced}</span> 名
+        <p className="mt-3 text-white/50 text-xs">
+          ※ うちワーク1またはワーク2のいずれか／両方が「バランス型」と判定された生徒：
+          <span className="font-bold text-white/80">{balanced}</span> 名
         </p>
       )}
     </div>

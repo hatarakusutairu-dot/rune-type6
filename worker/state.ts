@@ -176,12 +176,11 @@ export function computeCrossMatrix(s: InternalRoomState) {
   let balanced = 0;
   for (const st of s.students.values()) {
     if (!st.work1Type || !st.work2Type) continue;
-    if (st.work1Type === 'balanced' || st.work2Type === 'balanced') {
-      balanced += 1;
-      continue;
-    }
     const row = matrix[st.work1Type] ?? (matrix[st.work1Type] = {});
     row[st.work2Type] = (row[st.work2Type] ?? 0) + 1;
+    if (st.work1Type === 'balanced' || st.work2Type === 'balanced') {
+      balanced += 1;
+    }
   }
   return { matrix, balanced };
 }

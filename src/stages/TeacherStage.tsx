@@ -25,6 +25,7 @@ const PHASE_LABELS: Record<string, string> = {
   stage1_explain_2: '解説 アチーバー',
   stage1_explain_3: '解説 ソーシャライザー',
   stage1_explain_4: '解説 エクスプローラー',
+  stage1_explain_5: '解説 バランス型',
   stage1_bridge: 'ブリッジ',
   stage2_work2title: 'WORK2 タイトル',
   stage2_work2: 'WORK2 説明',
@@ -34,6 +35,7 @@ const PHASE_LABELS: Record<string, string> = {
   stage2_explain_2: '解説 ガーディアン',
   stage2_explain_3: '解説 アナリスト',
   stage2_explain_4: '解説 ブースター',
+  stage2_explain_5: '解説 バランス型',
   stage3_type: '総合タイトル',
   stage3_summary: 'クロス集計',
   stage3_share: '共有タイム',
@@ -66,7 +68,7 @@ const COLORS: Record<string, string> = {
   guardian: '#00BCD4',
   analyst: '#AA00FF',
   booster: '#FF4081',
-  balanced: '#9CA3AF',
+  balanced: '#C0C0C0',
 };
 
 const EXPLAIN_TYPE_W1: Record<string, string> = {
@@ -74,12 +76,14 @@ const EXPLAIN_TYPE_W1: Record<string, string> = {
   stage1_explain_2: 'achiever',
   stage1_explain_3: 'socializer',
   stage1_explain_4: 'explorer',
+  stage1_explain_5: 'balanced_w1',
 };
 const EXPLAIN_TYPE_W2: Record<string, string> = {
   stage2_explain_1: 'attacker',
   stage2_explain_2: 'guardian',
   stage2_explain_3: 'analyst',
   stage2_explain_4: 'booster',
+  stage2_explain_5: 'balanced_w2',
 };
 
 export default function TeacherStage() {
