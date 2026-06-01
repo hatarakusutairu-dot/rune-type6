@@ -22,12 +22,18 @@ export default function ReactionBurst() {
   const seenSeqRef = useRef<Set<number>>(new Set());
   const initializedRef = useRef(false);
 
+  // Only animate reactions on the teacher's big screen. Students still see
+  // and press the reaction bar at the bottom, but they shouldn't have the
+  // flying icons drifting over their quiz / result UI.
+  const isTeacher = room.role === 'teacher';
+
   useEffect(() => {
     if (!initializedRef.current) {
       initializedRef.current = true;
       if (last?.seq) seenSeqRef.current.add(last.seq);
       return;
     }
+    if (!isTeacher) return;
     if (!last?.seq) return;
     if (seenSeqRef.current.has(last.seq)) return;
     seenSeqRef.current.add(last.seq);
@@ -52,8 +58,9 @@ export default function ReactionBurst() {
       setBursts((prev) => prev.filter((b) => b.id !== id));
     }, burst.duration + 200);
     return () => clearTimeout(timer);
-  }, [last?.seq, last?.emoji]);
+  }, [last?.seq, last?.emoji, isTeacher]);
 
+  if (!isTeacher) return null;
   if (bursts.length === 0) return null;
 
   return (
