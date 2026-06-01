@@ -50,11 +50,19 @@ export default function Student() {
     // If the student is joining a *different* room than last time, wipe out
     // stale work1/work2/comment so they don't see fake results.
     const fresh = ensureRoom(code);
+    // Ensure we have a stable sid before sending, so a reconnect can resend
+    // S_JOIN with the same identity.
+    const sid = fresh.sid ?? crypto.randomUUID();
+    if (!fresh.sid) patchState({ sid });
     if (cls !== className) setClassName(cls);
     patchState({ className: cls });
+    // Arm a rejoin BEFORE sending so that if room.send() silently fails
+    // (WebSocket reported OPEN but is actually dead — common on PC Edge /
+    // mobile after backgrounding), the next (re)open resends S_JOIN.
+    room.armStudentRejoin({ code, className: cls, sid });
     room.send({
       type: 'S_JOIN',
-      payload: { code, className: cls, sid: fresh.sid },
+      payload: { code, className: cls, sid },
     });
     setJoined(true);
   }

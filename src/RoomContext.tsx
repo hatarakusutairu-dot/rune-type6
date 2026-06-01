@@ -25,6 +25,8 @@ interface RoomCtxValue {
   disconnect: () => void;
   /** Teacher.tsx calls this with the teacherToken so the socket auto-claims on (re)open. */
   armTeacherClaim: (token: string | null) => void;
+  /** Student.tsx calls this with a join payload so the socket auto-rejoins on (re)open. */
+  armStudentRejoin: (info: { code: string; className: string; sid: string } | null) => void;
   events: ServerEvents;
 }
 
@@ -211,6 +213,18 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
     teacherClaimRef.current = token;
   }, []);
 
+  /**
+   * Pre-arm an S_JOIN payload so any (re)open of the WebSocket will resend
+   * it. Called by Student.tsx right before send() so a click that lands on a
+   * "OPEN but actually dead" socket is recovered by the next reconnect.
+   */
+  const armStudentRejoin = useCallback(
+    (info: RejoinInfo | null) => {
+      rejoinRef.current = info;
+    },
+    [],
+  );
+
   useEffect(() => () => handleRef.current?.close(), []);
 
   const send = useCallback((msg: ClientMessage) => {
@@ -237,6 +251,7 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
       connectToRoom,
       disconnect,
       armTeacherClaim,
+      armStudentRejoin,
       events,
     }),
     [
@@ -255,6 +270,7 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
       connectToRoom,
       disconnect,
       armTeacherClaim,
+      armStudentRejoin,
       events,
     ],
   );
