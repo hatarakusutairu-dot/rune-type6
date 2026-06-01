@@ -115,6 +115,24 @@ export default function Student() {
     error: '接続エラー。再接続中…',
   };
 
+  // After the user pressed "入室", show an explicit loading screen until the
+  // server's JOINED response brings room.state back. This avoids the silent
+  // "click does nothing" case where the form would otherwise re-render
+  // identically and the student would think the button is broken.
+  if (joined && !room.state) {
+    return (
+      <main className="min-h-screen flex items-center justify-center p-6">
+        <div className="panel max-w-md w-full text-center">
+          <div className="text-5xl mb-3 animate-pulse">⚡</div>
+          <h2 className="text-xl font-bold mb-2">入室中…</h2>
+          <p className="text-white/60 text-sm">
+            少し時間がかかる場合があります（最大10秒）
+          </p>
+        </div>
+      </main>
+    );
+  }
+
   if (!joined || !room.state) {
     return (
       <main className="min-h-screen flex items-center justify-center p-6">
