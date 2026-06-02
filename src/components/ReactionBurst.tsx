@@ -31,20 +31,16 @@ export default function ReactionBurst() {
   const isAnswering = room.phase === 'stage1_active' || room.phase === 'stage2_active';
   const suppressBurst = isStudent && isAnswering;
 
-  // Whenever the suppression flag flips, also flush in-flight bursts and
-  // re-baseline seenSeqRef against the current latest seq. This means:
-  // - Entering a quiz: clear any animations still in-flight
-  // - Leaving a quiz: every reaction the server pushed during the quiz is
-  //   marked seen, so we won't replay them. Only seq strictly greater than
-  //   the high-water mark will animate from here on.
+  // Whenever the suppression flag flips, flush in-flight bursts so any
+  // half-animated icons disappear at the boundary. We do NOT mark the
+  // current latest seq as seen here — if a brand-new REACTION_BURST happens
+  // to land in the same render commit as the suppression flip, the main
+  // effect must still be allowed to animate it.
   useEffect(() => {
     if (lastSuppressRef.current === suppressBurst) return;
     lastSuppressRef.current = suppressBurst;
     setBursts([]);
-    if (last?.seq) {
-      seenSeqRef.current.add(last.seq);
-    }
-  }, [suppressBurst, last?.seq]);
+  }, [suppressBurst]);
 
   useEffect(() => {
     if (!initializedRef.current) {
