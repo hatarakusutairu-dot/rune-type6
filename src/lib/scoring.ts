@@ -52,17 +52,37 @@ export function calculateWork2Scores(answers: number[], questions: any[]): Work2
 
 // ===== スコア分析 =====
 
-export function analyzeScores(scores: Record<string, number>): ScoreAnalysis {
-  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+const W1_KEYS: readonly string[] = ['competitor', 'achiever', 'socializer', 'explorer'];
+const W2_KEYS: readonly string[] = ['attacker', 'guardian', 'analyst', 'booster'];
 
-  const mainType = sorted[0][0];
-  const mainScore = sorted[0][1];
-  const subType = sorted[1][0];
-  const subScore = sorted[1][1];
-  const thirdType = sorted[2][0];
-  const thirdScore = sorted[2][1];
-  const weakType = sorted[3][0];
-  const weakScore = sorted[3][1];
+/**
+ * Pad missing types with 0 so `sorted` always has the expected 4 entries.
+ * Without this, a student whose 20 answers concentrate on 1-3 types causes
+ * `sorted[1][0]` / `sorted[2][0]` / `sorted[3][0]` to throw TypeError, which
+ * crashes ResultCard at the quiz-end / analysis-screen transition.
+ */
+function padScores(scores: Record<string, number>): Record<string, number> {
+  const family = Object.keys(scores).some((k) => W1_KEYS.includes(k)) ? W1_KEYS : W2_KEYS;
+  const padded: Record<string, number> = {};
+  for (const k of family) padded[k] = scores[k] ?? 0;
+  // Preserve any unexpected keys (defensive — shouldn't normally happen).
+  for (const k of Object.keys(scores)) {
+    if (!(k in padded)) padded[k] = scores[k];
+  }
+  return padded;
+}
+
+export function analyzeScores(scores: Record<string, number>): ScoreAnalysis {
+  const sorted = Object.entries(padScores(scores)).sort((a, b) => b[1] - a[1]);
+
+  const mainType = sorted[0]?.[0] ?? 'competitor';
+  const mainScore = sorted[0]?.[1] ?? 0;
+  const subType = sorted[1]?.[0] ?? mainType;
+  const subScore = sorted[1]?.[1] ?? 0;
+  const thirdType = sorted[2]?.[0] ?? subType;
+  const thirdScore = sorted[2]?.[1] ?? 0;
+  const weakType = sorted[3]?.[0] ?? thirdType;
+  const weakScore = sorted[3]?.[1] ?? 0;
   const gapSize = mainScore - weakScore;
 
   // パターン判定

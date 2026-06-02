@@ -401,12 +401,20 @@ function CombinedResult() {
   const persisted = loadState();
   const w1 = persisted.work1;
   const w2 = persisted.work2;
-  const total = w1?.scores && w2?.scores
-    ? generateTotalAnalysis(
+  // Defensive: never let a surprising score distribution throw and kick the
+  // student to the global ErrorBoundary recovery screen.
+  let total: ReturnType<typeof generateTotalAnalysis> | null = null;
+  if (w1?.scores && w2?.scores) {
+    try {
+      total = generateTotalAnalysis(
         w1.scores as unknown as Work1Scores,
         w2.scores as unknown as Work2Scores,
-      )
-    : null;
+      );
+    } catch (e) {
+      console.error('CombinedResult analysis failed:', e, { w1, w2 });
+      total = null;
+    }
+  }
 
   return (
     <div className="space-y-4">
