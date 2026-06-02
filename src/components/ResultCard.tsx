@@ -42,19 +42,11 @@ export default function ResultCard({ workId, scores, mainType, subType, tieWith 
   const headline = isBalanced ? 'バランス型' : labels[mainType] ?? mainType;
   const color = isBalanced ? '#A0E7FF' : COLORS[mainType] ?? '#fff';
 
-  // Defensive: never let analysis generation crash the whole tree. If a
-  // student's score distribution surprises the analysis engine, fall back to
-  // a minimal card with just the headline + radar instead of taking the
-  // student to the global ErrorBoundary recovery screen.
-  let analysis: ReturnType<typeof generateWork1Analysis> | null = null;
-  try {
-    analysis = workId === 1
-      ? generateWork1Analysis(scores as unknown as Work1Scores)
-      : generateWork2Analysis(scores as unknown as Work2Scores);
-  } catch (e) {
-    console.error('ResultCard analysis failed:', e, { workId, scores, mainType, subType });
-    analysis = null;
-  }
+  // generateWork[12]Analysis is internally try/catched and always returns a
+  // (possibly minimal) AnalysisResult, so this never throws.
+  const analysis = workId === 1
+    ? generateWork1Analysis(scores as unknown as Work1Scores)
+    : generateWork2Analysis(scores as unknown as Work2Scores);
 
   return (
     <article className="panel" style={{ borderColor: `${color}55` }}>
@@ -63,10 +55,10 @@ export default function ResultCard({ workId, scores, mainType, subType, tieWith 
         <h2 className="text-4xl font-black" style={{ color }}>
           {headline}
         </h2>
-        {analysis?.catchcopy && (
+        {analysis.catchcopy && (
           <p className="text-white/90 mt-2 text-lg font-bold">{analysis.catchcopy}</p>
         )}
-        {analysis?.summary && (
+        {analysis.summary && (
           <p className="text-white/80 text-sm mt-3 leading-relaxed whitespace-pre-line">
             {analysis.summary}
           </p>
@@ -93,30 +85,22 @@ export default function ResultCard({ workId, scores, mainType, subType, tieWith 
         ※ 今日の回答での傾向です。固定的な性格分類ではありません。
       </p>
 
-      {analysis?.detail && (
+      {analysis.detail && (
         <DetailPara emoji="🔍" title="詳細分析" body={analysis.detail} />
       )}
 
-      {analysis && (
-        <div className="mt-4 space-y-4 text-sm">
-          <DetailSection emoji="💬" title="燃える言葉" items={analysis.motivators} />
-          <DetailSection emoji="🚫" title="やる気なくす言葉" items={analysis.demotivators} />
-          <DetailSection emoji="⚡" title="調子いい時のサイン" items={analysis.goodSigns} />
-          <DetailSection emoji="📉" title="調子悪い時のサイン" items={analysis.badSigns} />
-          {analysis.helpfulActions && (
-            <DetailPara emoji="🤝" title="こうしてもらえると助かる" body={analysis.helpfulActions} />
-          )}
-          {analysis.growthTip && (
-            <DetailPara emoji="🌱" title="伸びしろ" body={analysis.growthTip} />
-          )}
-        </div>
-      )}
-
-      {!analysis && (
-        <p className="text-white/60 text-sm mt-4 text-center">
-          詳細分析の生成に失敗しました。レーダーチャートを参考にしてください。
-        </p>
-      )}
+      <div className="mt-4 space-y-4 text-sm">
+        <DetailSection emoji="💬" title="燃える言葉" items={analysis.motivators} />
+        <DetailSection emoji="🚫" title="やる気なくす言葉" items={analysis.demotivators} />
+        <DetailSection emoji="⚡" title="調子いい時のサイン" items={analysis.goodSigns} />
+        <DetailSection emoji="📉" title="調子悪い時のサイン" items={analysis.badSigns} />
+        {analysis.helpfulActions && (
+          <DetailPara emoji="🤝" title="こうしてもらえると助かる" body={analysis.helpfulActions} />
+        )}
+        {analysis.growthTip && (
+          <DetailPara emoji="🌱" title="伸びしろ" body={analysis.growthTip} />
+        )}
+      </div>
     </article>
   );
 }

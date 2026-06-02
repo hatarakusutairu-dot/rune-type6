@@ -144,9 +144,39 @@ function getGapLevel(gap: number): 'large' | 'medium' | 'small' {
   return 'small';
 }
 
+// ===== 万一の throw を吸収するセーフティ用デフォルト =====
+
+function fallbackAnalysis(scores: Record<string, number>): AnalysisResult {
+  // Pick the highest-score type as a minimal main type. Padding ensures
+  // there's always at least one entry.
+  const sorted = Object.entries(padScores(scores)).sort((a, b) => b[1] - a[1]);
+  const main = sorted[0]?.[0] ?? '';
+  const sub = sorted[1]?.[0] ?? main;
+  return {
+    catchcopy: '今日の回答プロフィール',
+    summary: '今日の回答からあなたの傾向をまとめました。レーダーチャートを参考にしてください。',
+    detail: '',
+    motivators: [],
+    demotivators: [],
+    goodSigns: [],
+    badSigns: [],
+    helpfulActions: '',
+    growthTip: `主傾向：${main}／サブ傾向：${sub}`,
+  };
+}
+
 // ===== ワーク1 分析テキスト生成 =====
 
 export function generateWork1Analysis(scores: Work1Scores): AnalysisResult {
+  try {
+    return _generateWork1Analysis(scores);
+  } catch (e) {
+    console.error('generateWork1Analysis failed, using fallback:', e, { scores });
+    return fallbackAnalysis(scores);
+  }
+}
+
+function _generateWork1Analysis(scores: Work1Scores): AnalysisResult {
   const analysis = analyzeScores(scores);
 
   // キャッチコピー
@@ -217,6 +247,15 @@ export function generateWork1Analysis(scores: Work1Scores): AnalysisResult {
 // ===== ワーク2 分析テキスト生成 =====
 
 export function generateWork2Analysis(scores: Work2Scores): AnalysisResult {
+  try {
+    return _generateWork2Analysis(scores);
+  } catch (e) {
+    console.error('generateWork2Analysis failed, using fallback:', e, { scores });
+    return fallbackAnalysis(scores);
+  }
+}
+
+function _generateWork2Analysis(scores: Work2Scores): AnalysisResult {
   const analysis = analyzeScores(scores);
 
   const catchcopy = analysis.pattern === 'balanced'
@@ -276,9 +315,45 @@ export function generateWork2Analysis(scores: Work2Scores): AnalysisResult {
 
 // ===== 総合分析テキスト生成 =====
 
+function fallbackTotalAnalysis(
+  work1Scores: Work1Scores,
+  work2Scores: Work2Scores,
+): TotalAnalysisResult {
+  const w1Sorted = Object.entries(padScores(work1Scores)).sort((a, b) => b[1] - a[1]);
+  const w2Sorted = Object.entries(padScores(work2Scores)).sort((a, b) => b[1] - a[1]);
+  return {
+    catchcopy: '今日のプレイヤープロフィール',
+    summary:
+      '今日の回答からあなたのタイプをまとめました。詳しくはレーダーチャートと各ワークの結果カードを参考にしてください。',
+    detail: '',
+    motivators: [],
+    demotivators: [],
+    goodSigns: [],
+    badSigns: [],
+    helpfulActions: '',
+    teamRole: '',
+    growthTip: `ワーク1主傾向：${w1Sorted[0]?.[0] ?? '-'}／ワーク2主傾向：${w2Sorted[0]?.[0] ?? '-'}`,
+  };
+}
+
 export function generateTotalAnalysis(
   work1Scores: Work1Scores,
-  work2Scores: Work2Scores
+  work2Scores: Work2Scores,
+): TotalAnalysisResult {
+  try {
+    return _generateTotalAnalysis(work1Scores, work2Scores);
+  } catch (e) {
+    console.error('generateTotalAnalysis failed, using fallback:', e, {
+      work1Scores,
+      work2Scores,
+    });
+    return fallbackTotalAnalysis(work1Scores, work2Scores);
+  }
+}
+
+function _generateTotalAnalysis(
+  work1Scores: Work1Scores,
+  work2Scores: Work2Scores,
 ): TotalAnalysisResult {
   const w1 = analyzeScores(work1Scores);
   const w2 = analyzeScores(work2Scores);
