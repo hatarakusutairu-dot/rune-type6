@@ -22,12 +22,21 @@ export default function ReactionBurst() {
   const seenSeqRef = useRef<Set<number>>(new Set());
   const initializedRef = useRef(false);
 
+  // Hide reaction bursts on the student device only while they're answering a
+  // quiz (stage1_active / stage2_active) so the flying icons don't distract
+  // from the questions. Reactions still float on the teacher's big screen
+  // throughout, and on every other student phase they keep adding energy.
+  const isStudent = room.role === 'student';
+  const isAnswering = room.phase === 'stage1_active' || room.phase === 'stage2_active';
+  const suppressBurst = isStudent && isAnswering;
+
   useEffect(() => {
     if (!initializedRef.current) {
       initializedRef.current = true;
       if (last?.seq) seenSeqRef.current.add(last.seq);
       return;
     }
+    if (suppressBurst) return;
     if (!last?.seq) return;
     if (seenSeqRef.current.has(last.seq)) return;
     seenSeqRef.current.add(last.seq);
@@ -52,8 +61,9 @@ export default function ReactionBurst() {
       setBursts((prev) => prev.filter((b) => b.id !== id));
     }, burst.duration + 200);
     return () => clearTimeout(timer);
-  }, [last?.seq, last?.emoji]);
+  }, [last?.seq, last?.emoji, suppressBurst]);
 
+  if (suppressBurst) return null;
   if (bursts.length === 0) return null;
 
   return (
