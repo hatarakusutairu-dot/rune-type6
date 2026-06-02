@@ -36,10 +36,12 @@ export default function ReactionBurst() {
       if (last?.seq) seenSeqRef.current.add(last.seq);
       return;
     }
-    if (suppressBurst) return;
     if (!last?.seq) return;
     if (seenSeqRef.current.has(last.seq)) return;
+    // Always mark this seq as seen, even when suppressed, so a quiz-phase
+    // reaction backlog doesn't burst out the moment the student moves on.
     seenSeqRef.current.add(last.seq);
+    if (suppressBurst) return;
 
     if (seenSeqRef.current.size > 200) {
       const arr = Array.from(seenSeqRef.current);
