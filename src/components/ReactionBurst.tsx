@@ -21,6 +21,7 @@ export default function ReactionBurst() {
 
   const seenSeqRef = useRef<Set<number>>(new Set());
   const initializedRef = useRef(false);
+  const lastSuppressRef = useRef<boolean>(false);
 
   // Hide reaction bursts on the student device only while they're answering a
   // quiz (stage1_active / stage2_active) so the flying icons don't distract
@@ -30,6 +31,21 @@ export default function ReactionBurst() {
   const isAnswering = room.phase === 'stage1_active' || room.phase === 'stage2_active';
   const suppressBurst = isStudent && isAnswering;
 
+  // Whenever the suppression flag flips, also flush in-flight bursts and
+  // re-baseline seenSeqRef against the current latest seq. This means:
+  // - Entering a quiz: clear any animations still in-flight
+  // - Leaving a quiz: every reaction the server pushed during the quiz is
+  //   marked seen, so we won't replay them. Only seq strictly greater than
+  //   the high-water mark will animate from here on.
+  useEffect(() => {
+    if (lastSuppressRef.current === suppressBurst) return;
+    lastSuppressRef.current = suppressBurst;
+    setBursts([]);
+    if (last?.seq) {
+      seenSeqRef.current.add(last.seq);
+    }
+  }, [suppressBurst, last?.seq]);
+
   useEffect(() => {
     if (!initializedRef.current) {
       initializedRef.current = true;
@@ -38,8 +54,6 @@ export default function ReactionBurst() {
     }
     if (!last?.seq) return;
     if (seenSeqRef.current.has(last.seq)) return;
-    // Always mark this seq as seen, even when suppressed, so a quiz-phase
-    // reaction backlog doesn't burst out the moment the student moves on.
     seenSeqRef.current.add(last.seq);
     if (suppressBurst) return;
 
