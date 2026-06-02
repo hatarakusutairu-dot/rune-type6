@@ -691,14 +691,14 @@ function DistributionView({ workId }: { workId: 1 | 2 }) {
           <h3 className="text-2xl font-black">タイプ分布（ワーク{workId}）— 全体</h3>
           {data && (
             <span className="text-white/60 text-sm">
-              {Object.values(data.overall).reduce((a, b) => a + b, 0)} 名
+              {Object.values(data.overall ?? {}).reduce((a, b) => a + b, 0)} 名
             </span>
           )}
         </div>
         {data ? (
           <Distribution
-            data={data.overall}
-            order={orderFor(data.overall)}
+            data={data.overall ?? {}}
+            order={orderFor(data.overall ?? {})}
             labels={labels}
             colors={COLORS}
           />
@@ -712,7 +712,7 @@ function DistributionView({ workId }: { workId: 1 | 2 }) {
           <h3 className="text-lg font-bold mb-4 text-white/80">クラス別</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
             {classes.map((c) => {
-              const d = data.perClass[c] ?? {};
+              const d = data.perClass?.[c] ?? {};
               const total = Object.values(d).reduce((a, b) => a + b, 0);
               return (
                 <div key={c}>

@@ -20,17 +20,21 @@ export default function Quiz({ workId, questions }: Props) {
   const room = useRoom();
   const sid = room.sid ?? 'anon';
 
+  // Defensive against props being mis-passed (legacy data) or imports failing
+  // at runtime — keep using the array but guarantee it's an array.
+  const safeQuestions: Question[] = Array.isArray(questions) ? questions : [];
+
   const persisted = loadState();
   const persistedWork = workId === 1 ? persisted.work1 : persisted.work2;
   const initialAnswers = persistedWork?.answers ?? [];
 
   const [answers, setAnswers] = useState<number[]>(initialAnswers);
-  const [index, setIndex] = useState<number>(Math.min(initialAnswers.length, Math.max(0, questions.length - 1)));
+  const [index, setIndex] = useState<number>(Math.min(initialAnswers.length, Math.max(0, safeQuestions.length - 1)));
   const [submitted, setSubmitted] = useState<boolean>(
     !!(persistedWork?.mainType && persistedWork?.scores),
   );
 
-  const total = questions.length;
+  const total = safeQuestions.length;
   const order = workId === 1 ? WORK1_ORDER : WORK2_ORDER;
 
   // If we already submitted, skip the quiz UI.
@@ -42,12 +46,18 @@ export default function Quiz({ workId, questions }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const current = questions[index];
+  const current = safeQuestions[index];
 
   const shuffledOpts = useMemo(() => {
-    if (!current) return [];
+    if (!current || !Array.isArray(current.options) || current.options.length === 0) return [];
     const idx = shuffledIndices(current.options.length, sid, current.id);
-    return idx.map((i) => ({ ...current.options[i], originalIndex: i }));
+    return idx
+      .map((i) => {
+        const opt = current.options[i];
+        if (!opt || typeof opt !== 'object') return null;
+        return { ...opt, originalIndex: i };
+      })
+      .filter((o): o is { text: string; type: string; originalIndex: number } => o !== null);
   }, [current, sid]);
 
   function choose(originalIndex: number) {
@@ -63,7 +73,7 @@ export default function Quiz({ workId, questions }: Props) {
   }
 
   function finalize(finalAnswers: number[]) {
-    const scores = scoreAnswers(finalAnswers, questions);
+    const scores = scoreAnswers(finalAnswers, safeQuestions);
     const { mainType, subType } = judgeType(scores, order);
     patchWork(workId, { answers: finalAnswers, scores, mainType, subType });
     room.send({

@@ -20,13 +20,41 @@ export interface PersistedState {
 
 const DEFAULT_STATE: PersistedState = { version: VERSION };
 
+function isValidWork(w: unknown): w is PersistedWork {
+  if (!w || typeof w !== 'object') return false;
+  const obj = w as Record<string, unknown>;
+  if (!Array.isArray(obj.answers)) return false;
+  if (obj.scores !== undefined && (obj.scores === null || typeof obj.scores !== 'object')) {
+    return false;
+  }
+  if (obj.mainType !== undefined && typeof obj.mainType !== 'string') return false;
+  if (obj.subType !== undefined && typeof obj.subType !== 'string') return false;
+  return true;
+}
+
+function sanitize(s: PersistedState): PersistedState {
+  // Defensive: localStorage may have been touched by an older app version,
+  // a misbehaving extension, or the user via DevTools. Drop any work1/work2
+  // blob whose shape would make Quiz/ResultCard misread it (the type of
+  // 'scores' is the realistic damage vector — a null/string slips past the
+  // truthiness guards and crashes RadarChart / analyzeScores).
+  const next: PersistedState = { ...s, version: VERSION };
+  if (next.work1 !== undefined && !isValidWork(next.work1)) delete next.work1;
+  if (next.work2 !== undefined && !isValidWork(next.work2)) delete next.work2;
+  if (next.sid !== undefined && typeof next.sid !== 'string') delete next.sid;
+  if (next.roomCode !== undefined && typeof next.roomCode !== 'string') delete next.roomCode;
+  if (next.className !== undefined && typeof next.className !== 'string') delete next.className;
+  if (next.comment !== undefined && typeof next.comment !== 'string') delete next.comment;
+  return next;
+}
+
 function safeRead(): PersistedState {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return { ...DEFAULT_STATE };
     const parsed = JSON.parse(raw) as PersistedState;
     if (parsed.version !== VERSION) return { ...DEFAULT_STATE };
-    return parsed;
+    return sanitize(parsed);
   } catch {
     return { ...DEFAULT_STATE };
   }
