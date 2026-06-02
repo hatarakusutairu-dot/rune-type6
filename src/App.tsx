@@ -9,6 +9,7 @@ import ReactionBar from './components/ReactionBar';
 import ReactionBurst from './components/ReactionBurst';
 import ErrorBoundary from './components/ErrorBoundary';
 import ConnectionBanner from './components/ConnectionBanner';
+import SlidePreloader from './components/SlidePreloader';
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           <ConnectionBanner />
+          <SlidePreloader />
           <ReactionBurst />
           <ReactionBar />
           <CharacterCheckButton />
