@@ -5,6 +5,8 @@
     { "key": "kusa",    "label": "草" },
     { "key": "wow",     "label": "すごい" },
     { "key": "fight",   "label": "ファイト" },
-    { "key": "balance", "label": "バランス" }
+    { "key": "balance", "label": "バランス" },
+    { "key": "qq",      "label": "できたよ" },
+    { "key": "ee",      "label": "ちょっとまって" }
   ]
 }
