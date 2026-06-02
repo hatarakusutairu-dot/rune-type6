@@ -35,8 +35,13 @@ interface Attachment {
 export class RoomDO {
   private state: DurableObjectState;
   private room: InternalRoomState | null = null;
-  private reactionSeq = 0;
-  private characterSeq = 0;
+  // Seed from Date.now() so the sequence keeps monotonically increasing
+  // across DO eviction / restart. Otherwise a fresh DO would start back at
+  // 1, 2, 3 and every already-connected client would skip those bursts
+  // because the lower seqs are already in their seenSeqRef (looks like
+  // "buttons stop responding after a quiet stretch").
+  private reactionSeq = Date.now();
+  private characterSeq = Date.now();
 
   constructor(state: DurableObjectState) {
     this.state = state;
